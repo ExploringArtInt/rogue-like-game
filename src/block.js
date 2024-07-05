@@ -121,10 +121,10 @@ export default class Block {
     bulk.velocityX = MathUtils.clamp(bulk.velocityX, -bulk.maxSpeed, bulk.maxSpeed);
     bulk.velocityY = MathUtils.clamp(bulk.velocityY, -bulk.maxSpeed, bulk.maxSpeed);
 
-    // this.resolveThisCollision(bulk);
+    // this.resolveOverlap(bulk);
   }
 
-  resolveThisCollision(bulk) {
+  resolveOverlap(bulk) {
     const thisRect = this.getRect();
     const bulkRect = bulk.getRect();
 
@@ -167,7 +167,7 @@ export default class Block {
     this.x = MathUtils.clamp(this.x, 0, canvasWidth - this.size);
     this.y = MathUtils.clamp(this.y, 0, canvasHeight - this.size);
 
-    // Check collision with player
+    // Enable player to move this block
     if (this.checkCollision(player)) {
       this.resolveCollision(player);
     }

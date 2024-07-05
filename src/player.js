@@ -1,4 +1,3 @@
-import {} from "./block.js";
 import { MathUtils, Vector, Collision } from "./utilities.js";
 import { loadSVG } from "./svg.js";
 
@@ -45,7 +44,7 @@ export default class Player {
       const blockRect = block.getRect();
       if (Collision.rectIntersect(playerRect, blockRect)) {
         collided = true;
-        this.resolveThisCollision(block);
+        this.resolveOverlap(block);
       }
     }
 
@@ -56,7 +55,7 @@ export default class Player {
     }
   }
 
-  resolveThisCollision(bulk) {
+  resolveOverlap(bulk) {
     const thisRect = this.getRect();
     const bulkRect = bulk.getRect();
 
