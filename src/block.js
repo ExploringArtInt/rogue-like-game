@@ -48,11 +48,13 @@ export default class Block {
     );
   }
 
-  resolveCollision(player) {
+  resolveCollision(bulk) {
+    // bluk could be the player or another block
+
     // Calculate collision vector
     const collisionVector = {
-      x: this.x + this.size / 2 - player.x,
-      y: this.y + this.size / 2 - player.y,
+      x: this.x + this.size / 2 - bulk.x,
+      y: this.y + this.size / 2 - bulk.y,
     };
 
     // Normalize collision vector
@@ -60,8 +62,8 @@ export default class Block {
 
     // Calculate relative velocity
     const relativeVelocity = {
-      x: this.velocityX - player.velocityX,
-      y: this.velocityY - player.velocityY,
+      x: this.velocityX - bulk.velocityX,
+      y: this.velocityY - bulk.velocityY,
     };
 
     // Calculate relative velocity in terms of the normal direction
@@ -77,7 +79,7 @@ export default class Block {
 
     // Calculate impulse scalar
     const impulseScalar = -(1 + bounciness) * velocityAlongNormal;
-    const totalMass = this.mass + player.mass;
+    const totalMass = this.mass + bulk.mass;
     const impulse = impulseScalar / totalMass;
 
     // Apply impulse to velocities
@@ -93,12 +95,12 @@ export default class Block {
 
     this.velocityX += appliedImpulseX * (1 / this.mass);
     this.velocityY += appliedImpulseY * (1 / this.mass);
-    player.velocityX -= appliedImpulseX * (1 / player.mass);
-    player.velocityY -= appliedImpulseY * (1 / player.mass);
+    bulk.velocityX -= appliedImpulseX * (1 / bulk.mass);
+    bulk.velocityY -= appliedImpulseY * (1 / bulk.mass);
 
     // Prevent objects from sinking into each other
-    const percent = 0.8; // usually 20% to 80%
-    const slop = 0.1; // usually 0.01 to 0.1
+    const percent = 0.2; // usually 20% to 80%
+    const slop = 0.01; // usually 0.01 to 0.1
     const correction = (Math.max(velocityAlongNormal - slop, 0) / totalMass) * percent;
     const correctionVector = {
       x: collisionNormal.x * correction,
@@ -107,14 +109,14 @@ export default class Block {
 
     this.x += correctionVector.x * this.mass;
     this.y += correctionVector.y * this.mass;
-    player.x -= correctionVector.x * player.mass;
-    player.y -= correctionVector.y * player.mass;
+    bulk.x -= correctionVector.x * bulk.mass;
+    bulk.y -= correctionVector.y * bulk.mass;
 
     // Ensure velocities don't exceed maxSpeed
     this.velocityX = MathUtils.clamp(this.velocityX, -this.maxSpeed, this.maxSpeed);
     this.velocityY = MathUtils.clamp(this.velocityY, -this.maxSpeed, this.maxSpeed);
-    player.velocityX = MathUtils.clamp(player.velocityX, -player.maxSpeed, player.maxSpeed);
-    player.velocityY = MathUtils.clamp(player.velocityY, -player.maxSpeed, player.maxSpeed);
+    bulk.velocityX = MathUtils.clamp(bulk.velocityX, -bulk.maxSpeed, bulk.maxSpeed);
+    bulk.velocityY = MathUtils.clamp(bulk.velocityY, -bulk.maxSpeed, bulk.maxSpeed);
   }
 
   update(canvasWidth, canvasHeight, player, blocks) {
@@ -138,7 +140,10 @@ export default class Block {
     // Check collision with other blocks
     for (const block of blocks) {
       if (block !== this) {
-        if (Collision.rectIntersect({ x: this.x, y: this.y, width: this.size, height: this.size }, { x: block.x, y: block.y, width: block.size, height: block.size })) {
+        if (
+          Collision.rectIntersectOverMargin({ x: this.x, y: this.y, width: this.size, height: this.size }, { x: block.x, y: block.y, width: block.size, height: block.size }, 1)
+        ) {
+          console.debug("Block collision happened!");
           this.resolveCollision(block);
         }
       }

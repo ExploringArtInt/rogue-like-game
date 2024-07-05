@@ -39,6 +39,29 @@ const Collision = {
 
   rectIntersect: (rect1, rect2) => rect1.x < rect2.x + rect2.width && rect1.x + rect1.width > rect2.x && rect1.y < rect2.y + rect2.height && rect1.y + rect1.height > rect2.y,
 
+  rectIntersectOverMargin: (rect1, rect2, margin) => {
+    const adjustedRect1 = {
+      x: rect1.x + margin,
+      y: rect1.y + margin,
+      width: rect1.width - 2 * margin,
+      height: rect1.height - 2 * margin,
+    };
+
+    const adjustedRect2 = {
+      x: rect2.x + margin,
+      y: rect2.y + margin,
+      width: rect2.width - 2 * margin,
+      height: rect2.height - 2 * margin,
+    };
+
+    return (
+      adjustedRect1.x < adjustedRect2.x + adjustedRect2.width &&
+      adjustedRect1.x + adjustedRect1.width > adjustedRect2.x &&
+      adjustedRect1.y < adjustedRect2.y + adjustedRect2.height &&
+      adjustedRect1.y + adjustedRect1.height > adjustedRect2.y
+    );
+  },
+
   circleIntersect: (circle1, circle2) => {
     const dx = circle1.x - circle2.x;
     const dy = circle1.y - circle2.y;
