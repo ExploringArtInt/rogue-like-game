@@ -1,3 +1,4 @@
+// level.js
 import { MathUtils } from "./utilities.js";
 import Block from "./block.js";
 
@@ -12,40 +13,53 @@ export default class Level {
   }
 
   generateBlocks() {
-    const blockSize = this.blockSize;
-    const numColumns = Math.floor(this.width / blockSize);
-    const numRows = Math.floor(this.height / blockSize);
-    const offsetX = Math.floor((this.width % blockSize) / 2);
-    const offsetY = Math.floor((this.height % blockSize) / 2);
+    const { numColumns, numRows, offsetX, offsetY } = this.calculateGridDimensions();
     const gapSize = 0;
 
     for (let col = 0; col < numColumns; col++) {
-      if (col == Math.floor(numColumns / 2.0)) {
-        continue;
-      }
       for (let row = 0; row < numRows; row++) {
-        if (row == Math.floor(numRows / 2.0)) {
-          continue;
-        }
-        const y = row * blockSize + offsetY;
-        const x = col * blockSize + offsetX;
+        if (this.shouldSkipBlock(col, row, numColumns, numRows)) continue;
 
-        if (MathUtils.randomInt(0, 5) > 0) {
-          this.blocks.push(new Block(x, y, blockSize - gapSize, this.blockColor));
+        const position = this.calculateBlockPosition(col, row, offsetX, offsetY);
+        if (this.shouldCreateBlock()) {
+          this.createBlock(position.x, position.y, gapSize);
         }
       }
     }
+  }
+
+  calculateGridDimensions() {
+    const numColumns = Math.floor(this.width / this.blockSize);
+    const numRows = Math.floor(this.height / this.blockSize);
+    const offsetX = Math.floor((this.width % this.blockSize) / 2);
+    const offsetY = Math.floor((this.height % this.blockSize) / 2);
+    return { numColumns, numRows, offsetX, offsetY };
+  }
+
+  shouldSkipBlock(col, row, numColumns, numRows) {
+    return col === Math.floor(numColumns / 2) || row === Math.floor(numRows / 2);
+  }
+
+  calculateBlockPosition(col, row, offsetX, offsetY) {
+    const x = col * this.blockSize + offsetX;
+    const y = row * this.blockSize + offsetY;
+    return { x, y };
+  }
+
+  shouldCreateBlock() {
+    return MathUtils.randomInt(0, 5) > 0;
+  }
+
+  createBlock(x, y, gapSize) {
+    const block = new Block(x, y, this.blockSize - gapSize, this.blockColor);
+    this.blocks.push(block);
   }
 
   draw(ctx) {
-    for (const block of this.blocks) {
-      block.draw(ctx);
-    }
+    this.blocks.forEach((block) => block.draw(ctx));
   }
 
   update(player) {
-    for (const block of this.blocks) {
-      block.update(this.width, this.height, player, this.blocks);
-    }
+    this.blocks.forEach((block) => block.update(this.width, this.height, player, this.blocks));
   }
 }

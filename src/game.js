@@ -1,69 +1,95 @@
+// game.js
 import Player from "./player.js";
 import Level from "./level.js";
 
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-const backgroundColor = "#222222";
-const playerColor = "#DDDDDD";
-const blockColor = "#000000";
+class Game {
+  constructor() {
+    this.canvas = document.getElementById("gameCanvas");
+    this.ctx = this.canvas.getContext("2d");
+    this.backgroundColor = "#222222";
+    this.playerColor = "#DDDDDD";
+    this.blockColor = "#000000";
 
-// Responsive canvas size
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
+    this.setupCanvas();
+    this.setupEventListeners();
+    this.initializeGameObjects();
 
-// Create the player
-const playerSize = Math.min(canvas.width * 0.1, canvas.height * 0.1);
-const blockSize = Math.min(canvas.width * 0.15, canvas.height * 0.15);
-const player = new Player(canvas.width / 2, canvas.height / 2, playerSize, playerColor);
-
-// Create the level
-const level = new Level(blockColor, blockSize, canvas.width, canvas.height);
-
-let keys = {
-  ArrowUp: false,
-  ArrowDown: false,
-  ArrowLeft: false,
-  ArrowRight: false,
-  KeyW: false,
-  KeyA: false,
-  KeyS: false,
-  KeyD: false,
-};
-
-document.addEventListener("keydown", (event) => {
-  if (keys.hasOwnProperty(event.code)) {
-    keys[event.code] = true;
+    this.keys = {
+      ArrowUp: false,
+      ArrowDown: false,
+      ArrowLeft: false,
+      ArrowRight: false,
+      KeyW: false,
+      KeyA: false,
+      KeyS: false,
+      KeyD: false,
+    };
   }
-});
 
-document.addEventListener("keyup", (event) => {
-  if (keys.hasOwnProperty(event.code)) {
-    keys[event.code] = false;
+  setupCanvas() {
+    this.resizeCanvas();
+    window.addEventListener("resize", () => this.resizeCanvas());
   }
-});
 
-function gameLoop() {
-  // Clear the canvas
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = backgroundColor;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  resizeCanvas() {
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+  }
 
-  // Update
-  player.update(keys, canvas.width, canvas.height, level);
-  level.update(player);
-  player.lateUpdate(keys, canvas.width, canvas.height, level);
+  setupEventListeners() {
+    document.addEventListener("keydown", (event) => this.handleKeyDown(event));
+    document.addEventListener("keyup", (event) => this.handleKeyUp(event));
+  }
 
-  // draw
-  player.draw(ctx);
-  level.draw(ctx);
+  handleKeyDown(event) {
+    if (this.keys.hasOwnProperty(event.code)) {
+      this.keys[event.code] = true;
+    }
+  }
 
-  // Request next frame
-  requestAnimationFrame(gameLoop);
+  handleKeyUp(event) {
+    if (this.keys.hasOwnProperty(event.code)) {
+      this.keys[event.code] = false;
+    }
+  }
+
+  initializeGameObjects() {
+    const playerSize = Math.min(this.canvas.width * 0.1, this.canvas.height * 0.1);
+    const blockSize = Math.min(this.canvas.width * 0.15, this.canvas.height * 0.15);
+
+    this.player = new Player(this.canvas.width / 2, this.canvas.height / 2, playerSize, this.playerColor);
+    this.level = new Level(this.blockColor, blockSize, this.canvas.width, this.canvas.height);
+  }
+
+  update() {
+    this.player.update(this.keys, this.canvas.width, this.canvas.height, this.level);
+    this.level.update(this.player);
+    this.player.lateUpdate(this.keys, this.canvas.width, this.canvas.height, this.level);
+  }
+
+  draw() {
+    this.clearCanvas();
+    this.player.draw(this.ctx);
+    this.level.draw(this.ctx);
+  }
+
+  clearCanvas() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.fillStyle = this.backgroundColor;
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  gameLoop() {
+    this.update();
+    this.draw();
+    requestAnimationFrame(() => this.gameLoop());
+  }
+
+  start() {
+    this.gameLoop();
+  }
 }
 
-// Start the game loop
-gameLoop();
+// Create and start the game
+const game = new Game();
+game.start();
