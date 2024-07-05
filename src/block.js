@@ -1,4 +1,4 @@
-import { MathUtils } from "./utilities.js";
+import { MathUtils, Vector, Collision } from "./utilities.js";
 import { loadSVG } from "./svg.js";
 
 export default class Block {
@@ -9,6 +9,13 @@ export default class Block {
     this.color = color;
     this.svgImage = null;
     this.loadBlockSVG();
+
+    // New attributes
+    this.velocityX = 0;
+    this.velocityY = 0;
+    this.acceleration = 0.1;
+    this.maxSpeed = size * 0.4;
+    this.friction = 0.85;
   }
 
   loadBlockSVG() {
@@ -50,6 +57,55 @@ export default class Block {
       player.y = this.y + this.size + player.size / 1.9;
       player.velocityX = 0;
       player.velocityY = 0;
+    }
+  }
+
+  update(canvasWidth, canvasHeight, player, blocks) {
+    // Update position
+    this.x += this.velocityX;
+    this.y += this.velocityY;
+
+    // Apply friction
+    this.velocityX *= this.friction;
+    this.velocityY *= this.friction;
+
+    // Keep block within canvas bounds
+    this.x = MathUtils.clamp(this.x, 0, canvasWidth - this.size);
+    this.y = MathUtils.clamp(this.y, 0, canvasHeight - this.size);
+
+    // Check collision with player
+    if (this.checkCollision(player)) {
+      this.resolveCollision(player);
+    }
+
+    // Check collision with other blocks
+    for (const block of blocks) {
+      if (block !== this) {
+        if (Collision.rectIntersect({ x: this.x, y: this.y, width: this.size, height: this.size }, { x: block.x, y: block.y, width: block.size, height: block.size })) {
+          // Simple collision response: move blocks apart
+          const overlap = Math.min(Math.abs(this.x - block.x), Math.abs(this.y - block.y));
+          if (this.x < block.x) {
+            this.x -= overlap / 2;
+            block.x += overlap / 2;
+          } else {
+            this.x += overlap / 2;
+            block.x -= overlap / 2;
+          }
+          if (this.y < block.y) {
+            this.y -= overlap / 2;
+            block.y += overlap / 2;
+          } else {
+            this.y += overlap / 2;
+            block.y -= overlap / 2;
+          }
+
+          // Stop the blocks' movement
+          this.velocityX = 0;
+          this.velocityY = 0;
+          block.velocityX = 0;
+          block.velocityY = 0;
+        }
+      }
     }
   }
 }

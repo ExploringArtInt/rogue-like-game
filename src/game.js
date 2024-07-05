@@ -55,7 +55,8 @@ function gameLoop() {
   // Update player
   player.update(keys, canvas.width, canvas.height, level);
 
-  // Draw the level
+  // Update and draw the level
+  level.update(player);
   level.draw(ctx);
 
   // Draw player
