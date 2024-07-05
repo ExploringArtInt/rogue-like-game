@@ -1,62 +1,45 @@
+import Bulk from "./bulk.js";
 import { MathUtils, Vector, Collision } from "./utilities.js";
-import { loadSVG } from "./svg.js";
 
-export default class Block {
+export default class Block extends Bulk {
   constructor(x, y, size, color) {
-    this.x = x;
-    this.y = y;
-    this.prevX = this.x;
-    this.prevY = this.y;
-    this.size = size;
-    this.color = color;
-    this.svgImage = null;
-    this.loadBlockSVG();
-
-    this.velocityX = 0;
-    this.velocityY = 0;
-    this.acceleration = 0.1;
-    this.maxSpeed = size * 0.4;
-    this.friction = 0.85;
-    this.mass = size * size * 2; // Mass proportional to size
+    super(x, y, size, color, "./assets/svg/block.svg");
   }
 
-  getRect() {
-    return {
-      x: this.x,
-      y: this.y,
-      width: this.size,
-      height: this.size,
-    };
-  }
+  update(canvasWidth, canvasHeight, player, blocks) {
+    super.update(canvasWidth, canvasHeight);
 
-  loadBlockSVG() {
-    loadSVG("./assets/svg/block.svg", this.color)
-      .then((image) => {
-        this.svgImage = image;
-      })
-      .catch((error) => console.error("Error loading SVG:", error));
-  }
+    // Enable player to move this block
+    if (this.checkCollisionWithBlocks(player)) {
+      this.resolveCollisionWithBlocks(player);
+    }
 
-  draw(ctx) {
-    if (this.svgImage && this.svgImage.complete) {
-      ctx.drawImage(this.svgImage, this.x, this.y, this.size, this.size);
+    // Check collision with other blocks
+    for (const block of blocks) {
+      if (block !== this) {
+        // margin of 1 very important for very bounce environments
+        if (Collision.rectIntersectOverMargin(this.getRect(), block.getRect(), 1)) {
+          this.resolveCollisionWithBlocks(block);
+          this.resolveOverlapWithBlocks(block);
+        }
+      }
     }
   }
 
   // must be exact with no margin or player will not interact with blocks, only be stopped by them
-  checkCollision(player) {
+  checkCollisionWithBlocks(player) {
     return Collision.rectIntersect(
       { x: this.x, y: this.y, width: this.size, height: this.size },
       { x: player.x - player.size / 2, y: player.y - player.size / 2, width: player.size, height: player.size },
     );
   }
 
-  resolveCollision(bulk, resolveOverlapFlag) {
+  resolveCollisionWithBlocks(bulk, resolveOverlapFlag) {
     // bulk could be the player or another block
 
     // Calculate bounciness (restitution)
-    const bounciness = 0.1; // normal value is 0.1
-    const minImpulse = 0.1; // normal value is 0.1 Minimum impulse to apply
+    const bounciness = 5.1; // min 0.1 (solid) to 10 (bouncy)
+    const minImpulse = 5.1; // min 0.1 (solid) to 10 (bouncy)
     const impluseScaler = 10000;
     const correctionPercent = 0; // refactor out?
     const slop = 0; // refactor out?
@@ -117,11 +100,11 @@ export default class Block {
     bulk.velocityY = MathUtils.clamp(bulk.velocityY, -bulk.maxSpeed, bulk.maxSpeed);
 
     if (resolveOverlapFlag) {
-      this.resolveOverlap(bulk);
+      this.resolveOverlapWithBlocks(bulk);
     }
   }
 
-  resolveOverlap(bulk) {
+  resolveOverlapWithBlocks(bulk) {
     if (this.x < bulk.x) {
       this.x -= 1;
       bulk.x += 1;
@@ -135,41 +118,6 @@ export default class Block {
     } else {
       this.y += 1;
       bulk.y -= 1;
-    }
-  }
-
-  update(canvasWidth, canvasHeight, player, blocks) {
-    // store location before update
-    this.prevX = this.x;
-    this.prevY = this.y;
-
-    // Update position
-    this.x += this.velocityX;
-    this.y += this.velocityY;
-
-    // Apply friction
-    this.velocityX *= this.friction;
-    this.velocityY *= this.friction;
-
-    // Keep block within canvas bounds
-    this.x = MathUtils.clamp(this.x, 0, canvasWidth - this.size);
-    this.y = MathUtils.clamp(this.y, 0, canvasHeight - this.size);
-
-    // Enable player to move this block
-    if (this.checkCollision(player)) {
-      this.resolveCollision(player, false);
-    }
-
-    // Check collision with other blocks
-    for (const block of blocks) {
-      if (block !== this) {
-        // margin of 1 very important for very bounce environments
-        if (
-          Collision.rectIntersectOverMargin({ x: this.x, y: this.y, width: this.size, height: this.size }, { x: block.x, y: block.y, width: block.size, height: block.size }, 1)
-        ) {
-          this.resolveCollision(block, true);
-        }
-      }
     }
   }
 }
