@@ -1,0 +1,20 @@
+/* css/styles.css */
+body,
+html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #000000;
+}
+
+canvas {
+    display: block;
+}
+
+.playerColor {
+    color: #eeeeee; /* Set the player's color */
+}
+
+.backgroundColor {
+    background-color: #222222; /* Set the background color */
+}
