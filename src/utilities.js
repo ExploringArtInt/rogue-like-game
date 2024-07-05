@@ -17,6 +17,11 @@ const MathUtils = {
 const Vector = {
   add: (v1, v2) => ({ x: v1.x + v2.x, y: v1.y + v2.y }),
 
+  clamp: (v, min, max) => ({
+    x: MathUtils.clamp(v.x, min, max),
+    y: MathUtils.clamp(v.y, min, max),
+  }),
+
   subtract: (v1, v2) => ({ x: v1.x - v2.x, y: v1.y - v2.y }),
 
   multiply: (v, scalar) => ({ x: v.x * scalar, y: v.y * scalar }),

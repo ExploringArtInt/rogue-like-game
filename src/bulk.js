@@ -1,16 +1,14 @@
+// bulk.js
 import { MathUtils, Vector, Collision } from "./utilities.js";
 import { loadSVG } from "./svg.js";
 
 export default class Bulk {
   constructor(x, y, size, color, svgPath, isOriginCenter = false) {
-    this.x = x;
-    this.y = y;
-    this.prevX = this.x;
-    this.prevY = this.y;
+    this.position = { x, y };
+    this.prevPosition = { x, y };
     this.size = size;
     this.color = color;
-    this.velocityX = 0;
-    this.velocityY = 0;
+    this.velocity = { x: 0, y: 0 };
     this.acceleration = 0.1;
     this.maxSpeed = size * 0.4;
     this.friction = 0.85;
@@ -21,21 +19,20 @@ export default class Bulk {
   }
 
   getRect() {
-    if (this.isOriginCenter) {
-      return {
-        x: this.x - this.size / 2,
-        y: this.y - this.size / 2,
-        width: this.size,
-        height: this.size,
-      };
-    } else {
-      return {
-        x: this.x,
-        y: this.y,
-        width: this.size,
-        height: this.size,
-      };
-    }
+    const halfSize = this.size / 2;
+    return this.isOriginCenter
+      ? {
+          x: this.position.x - halfSize,
+          y: this.position.y - halfSize,
+          width: this.size,
+          height: this.size,
+        }
+      : {
+          x: this.position.x,
+          y: this.position.y,
+          width: this.size,
+          height: this.size,
+        };
   }
 
   loadSVG(svgPath) {
@@ -48,31 +45,42 @@ export default class Bulk {
 
   draw(ctx) {
     if (this.svgImage && this.svgImage.complete) {
-      if (this.isOriginCenter) {
-        ctx.drawImage(this.svgImage, this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
-      } else {
-        ctx.drawImage(this.svgImage, this.x, this.y, this.size, this.size);
-      }
+      const drawPosition = this.isOriginCenter
+        ? {
+            x: this.position.x - this.size / 2,
+            y: this.position.y - this.size / 2,
+          }
+        : this.position;
+      ctx.drawImage(this.svgImage, drawPosition.x, drawPosition.y, this.size, this.size);
     }
   }
 
   update(canvasWidth, canvasHeight) {
-    this.prevX = this.x;
-    this.prevY = this.y;
+    this.updatePosition();
+    this.applyFriction();
+    this.constrainPosition(canvasWidth, canvasHeight);
+  }
 
-    this.x += this.velocityX;
-    this.y += this.velocityY;
+  updatePosition() {
+    this.prevPosition = { ...this.position };
+    this.position.x += this.velocity.x;
+    this.position.y += this.velocity.y;
+  }
 
-    this.velocityX *= this.friction;
-    this.velocityY *= this.friction;
+  applyFriction() {
+    this.velocity.x *= this.friction;
+    this.velocity.y *= this.friction;
+  }
 
-    if (this.isOriginCenter) {
-      this.x = MathUtils.clamp(this.x, this.size / 2, canvasWidth - this.size / 2);
-      this.y = MathUtils.clamp(this.y, this.size / 2, canvasHeight - this.size / 2);
-    } else {
-      this.x = MathUtils.clamp(this.x, 0, canvasWidth - this.size);
-      this.y = MathUtils.clamp(this.y, 0, canvasHeight - this.size);
-    }
+  constrainPosition(canvasWidth, canvasHeight) {
+    const halfSize = this.size / 2;
+    const minX = this.isOriginCenter ? halfSize : 0;
+    const minY = this.isOriginCenter ? halfSize : 0;
+    const maxX = this.isOriginCenter ? canvasWidth - halfSize : canvasWidth - this.size;
+    const maxY = this.isOriginCenter ? canvasHeight - halfSize : canvasHeight - this.size;
+
+    this.position.x = MathUtils.clamp(this.position.x, minX, maxX);
+    this.position.y = MathUtils.clamp(this.position.y, minY, maxY);
   }
 
   checkCollision(other) {
@@ -87,41 +95,28 @@ export default class Bulk {
     const thisCenter = this.getCenter();
     const otherCenter = other.getCenter();
 
-    const collisionVector = {
-      x: thisCenter.x - otherCenter.x,
-      y: thisCenter.y - otherCenter.y,
-    };
-
+    const collisionVector = Vector.subtract(thisCenter, otherCenter);
     const collisionNormal = Vector.normalize(collisionVector);
 
-    const relativeVelocity = {
-      x: this.velocityX - other.velocityX,
-      y: this.velocityY - other.velocityY,
-    };
-
+    const relativeVelocity = Vector.subtract(this.velocity, other.velocity);
     const velocityAlongNormal = Vector.dotProduct(relativeVelocity, collisionNormal);
 
     const impulseScalar = -(1 + bounciness) * velocityAlongNormal;
     const totalMass = this.mass + other.mass;
     const impulse = impulseScalar / totalMass;
 
-    const impulseVector = {
-      x: impulse * collisionNormal.x,
-      y: impulse * collisionNormal.y,
+    const impulseVector = Vector.multiply(collisionNormal, impulse);
+
+    const appliedImpulse = {
+      x: Math.sign(impulseVector.x) * Math.max(Math.abs(impulseVector.x), minImpulse) * impulseScaler,
+      y: Math.sign(impulseVector.y) * Math.max(Math.abs(impulseVector.y), minImpulse) * impulseScaler,
     };
 
-    const appliedImpulseX = Math.sign(impulseVector.x) * Math.max(Math.abs(impulseVector.x), minImpulse) * impulseScaler;
-    const appliedImpulseY = Math.sign(impulseVector.y) * Math.max(Math.abs(impulseVector.y), minImpulse) * impulseScaler;
+    this.velocity = Vector.add(this.velocity, Vector.multiply(appliedImpulse, 1 / this.mass));
+    other.velocity = Vector.subtract(other.velocity, Vector.multiply(appliedImpulse, 1 / other.mass));
 
-    this.velocityX += appliedImpulseX * (1 / this.mass);
-    this.velocityY += appliedImpulseY * (1 / this.mass);
-    other.velocityX -= appliedImpulseX * (1 / other.mass);
-    other.velocityY -= appliedImpulseY * (1 / other.mass);
-
-    this.velocityX = MathUtils.clamp(this.velocityX, -this.maxSpeed, this.maxSpeed);
-    this.velocityY = MathUtils.clamp(this.velocityY, -this.maxSpeed, this.maxSpeed);
-    other.velocityX = MathUtils.clamp(other.velocityX, -other.maxSpeed, other.maxSpeed);
-    other.velocityY = MathUtils.clamp(other.velocityY, -other.maxSpeed, other.maxSpeed);
+    this.velocity = Vector.clamp(this.velocity, -this.maxSpeed, this.maxSpeed);
+    other.velocity = Vector.clamp(other.velocity, -other.maxSpeed, other.maxSpeed);
 
     this.resolveOverlap(other);
   }
@@ -134,29 +129,22 @@ export default class Bulk {
     const overlapY = Math.min(thisRect.y + thisRect.height - otherRect.y, otherRect.y + otherRect.height - thisRect.y);
 
     if (overlapX < overlapY) {
-      if (this.getCenter().x < other.getCenter().x) {
-        this.x -= overlapX / 2;
-        other.x += overlapX / 2;
-      } else {
-        this.x += overlapX / 2;
-        other.x -= overlapX / 2;
-      }
+      const adjustment = overlapX / 2;
+      this.position.x += this.getCenter().x < other.getCenter().x ? -adjustment : adjustment;
+      other.position.x += this.getCenter().x < other.getCenter().x ? adjustment : -adjustment;
     } else {
-      if (this.getCenter().y < other.getCenter().y) {
-        this.y -= overlapY / 2;
-        other.y += overlapY / 2;
-      } else {
-        this.y += overlapY / 2;
-        other.y -= overlapY / 2;
-      }
+      const adjustment = overlapY / 2;
+      this.position.y += this.getCenter().y < other.getCenter().y ? -adjustment : adjustment;
+      other.position.y += this.getCenter().y < other.getCenter().y ? adjustment : -adjustment;
     }
   }
 
   getCenter() {
-    if (this.isOriginCenter) {
-      return { x: this.x, y: this.y };
-    } else {
-      return { x: this.x + this.size / 2, y: this.y + this.size / 2 };
-    }
+    return this.isOriginCenter
+      ? this.position
+      : {
+          x: this.position.x + this.size / 2,
+          y: this.position.y + this.size / 2,
+        };
   }
 }

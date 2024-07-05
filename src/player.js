@@ -1,13 +1,20 @@
+// player.js
 import Bulk from "./bulk.js";
 import { Vector, MathUtils } from "./utilities.js";
 
 export default class Player extends Bulk {
   constructor(x, y, size, color) {
-    // Highlight: Changed to set isOriginCenter to true
     super(x, y, size, color, "./assets/svg/player.svg", true);
+    this.acceleration = 0.1;
   }
 
   update(keys, canvasWidth, canvasHeight, level) {
+    const desiredVelocity = this.calculateDesiredVelocity(keys);
+    this.updateVelocity(desiredVelocity);
+    super.update(canvasWidth, canvasHeight);
+  }
+
+  calculateDesiredVelocity(keys) {
     let desiredVelocity = { x: 0, y: 0 };
 
     if (keys.ArrowLeft || keys.KeyA) desiredVelocity.x -= 1;
@@ -18,15 +25,15 @@ export default class Player extends Bulk {
     if (desiredVelocity.x !== 0 || desiredVelocity.y !== 0) {
       desiredVelocity = Vector.normalize(desiredVelocity);
       desiredVelocity = Vector.multiply(desiredVelocity, this.maxSpeed);
-
-      let deltaVelocity = Vector.subtract(desiredVelocity, { x: this.velocityX, y: this.velocityY });
-
-      let t = MathUtils.bezierBlend(this.acceleration);
-      this.velocityX += deltaVelocity.x * t;
-      this.velocityY += deltaVelocity.y * t;
     }
 
-    super.update(canvasWidth, canvasHeight);
+    return desiredVelocity;
+  }
+
+  updateVelocity(desiredVelocity) {
+    const deltaVelocity = Vector.subtract(desiredVelocity, this.velocity);
+    const t = MathUtils.bezierBlend(this.acceleration);
+    this.velocity = Vector.add(this.velocity, Vector.multiply(deltaVelocity, t));
   }
 
   lateUpdate(keys, canvasWidth, canvasHeight, level) {
