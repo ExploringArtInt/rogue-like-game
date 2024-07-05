@@ -56,31 +56,7 @@ export default class Player {
     this.x = MathUtils.clamp(this.x, this.size / 2, canvasWidth - this.size / 2);
     this.y = MathUtils.clamp(this.y, this.size / 2, canvasHeight - this.size / 2);
 
-    for (const block of level.blocks) {
-      if (Collision.rectIntersect({ x: this.x - this.size / 2, y: this.y - this.size / 2, width: this.size, height: this.size }, block)) {
-        // Resolve collision with the block
-        this.resolveCollision(block);
-      }
-    }
-  }
-
-  resolveCollision(block) {
-    // Adjust the player's position to resolve the collision
-    // divide by 1.9 instead of 2 to avoid getting stuck on corners
-    if (this.x < block.x) {
-      this.x = block.x - this.size / 1.9;
-    } else if (this.x > block.x + block.width) {
-      this.x = block.x + block.width + this.size / 1.9;
-      this.velocityX = 0;
-      this.velocityY = 0;
-    }
-    if (this.y < block.y) {
-      this.y = block.y - this.size / 1.9;
-    } else if (this.y > block.y + block.height) {
-      this.y = block.y + block.height + this.size / 1.9;
-      this.velocityX = 0;
-      this.velocityY = 0;
-    }
+    level.checkCollisions(this);
   }
 
   draw(ctx) {

@@ -1,23 +1,14 @@
-import { MathUtils, Collision } from "./utilities.js";
-import { loadSVG } from "./svg.js";
+import { MathUtils } from "./utilities.js";
+import Block from "./block.js";
 
 export default class Level {
-  constructor(blockSize, width, height) {
+  constructor(blockColor, blockSize, width, height) {
+    this.blockColor = blockColor;
     this.blockSize = blockSize;
     this.width = width;
     this.height = height;
     this.blocks = [];
     this.generateBlocks();
-    this.svgImage = null;
-    this.loadBlockSVG();
-  }
-
-  loadBlockSVG() {
-    loadSVG("./assets/svg/block.svg", this.color)
-      .then((image) => {
-        this.svgImage = image;
-      })
-      .catch((error) => console.error("Error loading SVG:", error));
   }
 
   generateBlocks() {
@@ -40,47 +31,22 @@ export default class Level {
         const x = col * blockSize + offsetX;
 
         if (MathUtils.randomInt(0, 5) > 0) {
-          this.blocks.push({ x, y, width: blockSize, height: blockSize });
-        }
-
-        /* console.debug("(col, row) = (", col, ",", row, ")", x, y); */
-      }
-    }
-
-    /*
-    while (this.blocks.length < numColumns * numRows && attemptCount < maxAttempts) {
-      /*
-      const x = MathUtils.randomInt(0, this.width - blockSize);
-      const y = MathUtils.randomInt(0, this.height - blockSize);
-
-      // Check if the new block overlaps with any existing blocks
-      let overlaps = false;
-      for (const block of this.blocks) {
-        if (Collision.rectIntersect({ x, y, width: blockSize, height: blockSize }, block)) {
-          overlaps = true;
-          break;
+          this.blocks.push(new Block(x, y, blockSize, this.blockColor));
         }
       }
-
-      if (!overlaps && x % (blockSize + gapSize) >= gapSize && y % (blockSize + gapSize) >= gapSize) {
-        this.blocks.push({ x, y, width: blockSize, height: blockSize });
-      }
-
-
-      attemptCount++;
     }
-
-    if (this.blocks.length !== numColumns * numRows) {
-      console.log(`Warning: Could not generate all blocks without overlap. Generated ${this.blocks.length} out of ${numColumns * numRows} blocks.`);
-    }
-    */
   }
 
   draw(ctx) {
-    // Draw blocks using SVG
     for (const block of this.blocks) {
-      if (this.svgImage && this.svgImage.complete) {
-        ctx.drawImage(this.svgImage, block.x, block.y, block.width, block.height);
+      block.draw(ctx);
+    }
+  }
+
+  checkCollisions(player) {
+    for (const block of this.blocks) {
+      if (block.checkCollision(player)) {
+        block.resolveCollision(player);
       }
     }
   }

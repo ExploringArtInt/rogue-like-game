@@ -4,7 +4,8 @@ import Level from "./level.js";
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const backgroundColor = "#222222";
-const playerColor = "#EEEEEE";
+const playerColor = "#DDDDDD";
+const blockColor = "#000000";
 
 // Responsive canvas size
 function resizeCanvas() {
@@ -20,7 +21,7 @@ const blockSize = Math.min(canvas.width * 0.15, canvas.height * 0.15);
 const player = new Player(canvas.width / 2, canvas.height / 2, playerSize, playerColor);
 
 // Create the level
-const level = new Level(blockSize, canvas.width, canvas.height);
+const level = new Level(blockColor, blockSize, canvas.width, canvas.height);
 
 let keys = {
   ArrowUp: false,
