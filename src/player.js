@@ -4,7 +4,7 @@ import { Vector, MathUtils } from "./utilities.js";
 
 export default class Player extends Bulk {
   constructor(x, y, size, color) {
-    super(x, y, size, color, "./assets/svg/player.svg", true);
+    super(x, y, size, color, "./assets/svg/robots/robot-player.svg", true);
     this.acceleration = 0.1;
   }
 

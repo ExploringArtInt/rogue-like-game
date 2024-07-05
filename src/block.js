@@ -4,7 +4,7 @@ import Bulk from "./bulk.js";
 export default class Block extends Bulk {
   constructor(x, y, size, color) {
     // Highlight: Changed to set isOriginCenter to false
-    super(x, y, size, color, "./assets/svg/block.svg", false);
+    super(x, y, size, color, "./assets/svg/blocks/block-hex.svg", false);
   }
 
   update(canvasWidth, canvasHeight, player, blocks) {
