@@ -17,7 +17,7 @@ export default class Level {
     const numRows = Math.floor(this.height / blockSize);
     const offsetX = Math.floor((this.width % blockSize) / 2);
     const offsetY = Math.floor((this.height % blockSize) / 2);
-    const gapSize = blockSize * 0;
+    const gapSize = 0;
 
     for (let col = 0; col < numColumns; col++) {
       if (col == Math.floor(numColumns / 2.0)) {

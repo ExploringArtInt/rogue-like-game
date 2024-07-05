@@ -1,3 +1,4 @@
+import {} from "./block.js";
 import { MathUtils, Vector, Collision } from "./utilities.js";
 import { loadSVG } from "./svg.js";
 
@@ -36,7 +37,62 @@ export default class Player {
       .catch((error) => console.error("Error loading SVG:", error));
   }
 
+  handleBlockCollisions(blocks, prevX, prevY) {
+    const playerRect = this.getRect();
+    let collided = false;
+
+    for (const block of blocks) {
+      const blockRect = block.getRect();
+      if (Collision.rectIntersect(playerRect, blockRect)) {
+        collided = true;
+        this.resolveThisCollision(block);
+      }
+    }
+
+    if (collided) {
+      // Update velocity after collision resolution
+      this.velocityX = this.x - prevX;
+      this.velocityY = this.y - prevY;
+    }
+  }
+
+  resolveThisCollision(bulk) {
+    const thisRect = this.getRect();
+    const bulkRect = bulk.getRect();
+
+    // Calculate overlap on each axis
+    const overlapX = Math.min(Math.abs(thisRect.x + thisRect.width - bulkRect.x), Math.abs(bulkRect.x + bulkRect.width - thisRect.x));
+    const overlapY = Math.min(Math.abs(thisRect.y + thisRect.height - bulkRect.y), Math.abs(bulkRect.y + bulkRect.height - thisRect.y));
+
+    // Determine which axis has the smaller overlap
+    if (overlapX < overlapY) {
+      // Collision on X-axis
+      if (this.x < bulk.x) {
+        this.x = bulk.x - this.size / 2;
+      } else {
+        this.x = bulk.x + bulk.size + this.size / 2;
+      }
+    } else {
+      // Collision on Y-axis
+      if (this.y < bulk.y) {
+        this.y = bulk.y - this.size / 2;
+      } else {
+        this.y = bulk.y + bulk.size + this.size / 2;
+      }
+    }
+  }
+
+  draw(ctx) {
+    if (this.svgImage && this.svgImage.complete) {
+      ctx.drawImage(this.svgImage, this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
+    }
+  }
+
   update(keys, canvasWidth, canvasHeight, level) {
+    // store location for late update
+    this.prevX = this.x;
+    this.prevY = this.y;
+
     let desiredVelocity = { x: 0, y: 0 };
 
     // Check for both arrow keys and WASD
@@ -60,10 +116,6 @@ export default class Player {
       this.velocityY *= this.friction;
     }
 
-    // store location for late update
-    this.prevX = this.x;
-    this.prevY = this.y;
-
     // Update position
     this.x += this.velocityX;
     this.y += this.velocityY;
@@ -76,56 +128,5 @@ export default class Player {
   lateUpdate(keys, canvasWidth, canvasHeight, level) {
     // Check collisions with blocks
     this.handleBlockCollisions(level.blocks, this.prevX, this.prevY);
-  }
-
-  handleBlockCollisions(blocks, prevX, prevY) {
-    const playerRect = this.getRect();
-    let collided = false;
-
-    for (const block of blocks) {
-      const blockRect = block.getRect();
-      if (Collision.rectIntersect(playerRect, blockRect)) {
-        collided = true;
-        this.resolveThisCollision(block, prevX, prevY);
-      }
-    }
-
-    if (collided) {
-      // Update velocity after collision resolution
-      this.velocityX = this.x - prevX;
-      this.velocityY = this.y - prevY;
-    }
-  }
-
-  resolveThisCollision(block, prevX, prevY) {
-    const playerRect = this.getRect();
-    const blockRect = block.getRect();
-
-    // Calculate overlap on each axis
-    const overlapX = Math.min(Math.abs(playerRect.x + playerRect.width - blockRect.x), Math.abs(blockRect.x + blockRect.width - playerRect.x));
-    const overlapY = Math.min(Math.abs(playerRect.y + playerRect.height - blockRect.y), Math.abs(blockRect.y + blockRect.height - playerRect.y));
-
-    // Determine which axis has the smaller overlap
-    if (overlapX < overlapY) {
-      // Collision on X-axis
-      if (this.x < block.x) {
-        this.x = block.x - this.size / 2;
-      } else {
-        this.x = block.x + block.size + this.size / 2;
-      }
-    } else {
-      // Collision on Y-axis
-      if (this.y < block.y) {
-        this.y = block.y - this.size / 2;
-      } else {
-        this.y = block.y + block.size + this.size / 2;
-      }
-    }
-  }
-
-  draw(ctx) {
-    if (this.svgImage && this.svgImage.complete) {
-      ctx.drawImage(this.svgImage, this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
-    }
   }
 }

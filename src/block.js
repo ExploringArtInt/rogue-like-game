@@ -5,6 +5,8 @@ export default class Block {
   constructor(x, y, size, color) {
     this.x = x;
     this.y = y;
+    this.prevX = this.x;
+    this.prevY = this.y;
     this.size = size;
     this.color = color;
     this.svgImage = null;
@@ -15,7 +17,7 @@ export default class Block {
     this.acceleration = 0.1;
     this.maxSpeed = size * 0.4;
     this.friction = 0.85;
-    this.mass = size * size * 2; // Mass proportional to size
+    this.mass = size * size; // Mass proportional to size
   }
 
   getRect() {
@@ -41,6 +43,7 @@ export default class Block {
     }
   }
 
+  // must be exact with no margin or player will not interact with blocks, only be stopped by them
   checkCollision(player) {
     return Collision.rectIntersect(
       { x: this.x, y: this.y, width: this.size, height: this.size },
@@ -49,7 +52,14 @@ export default class Block {
   }
 
   resolveCollision(bulk) {
-    // bluk could be the player or another block
+    // bulk could be the player or another block
+
+    // Calculate bounciness (restitution)
+    const bounciness = 0.1;
+    const minImpulse = 0.1; // Minimum impulse to apply
+    const impluseScaler = 10000;
+    const correctionPercent = 0; // refactor out?
+    const slop = 0; // refactor out?
 
     // Calculate collision vector
     const collisionVector = {
@@ -74,9 +84,6 @@ export default class Block {
       return;
     }
 
-    // Calculate bounciness (restitution)
-    const bounciness = 0.5;
-
     // Calculate impulse scalar
     const impulseScalar = -(1 + bounciness) * velocityAlongNormal;
     const totalMass = this.mass + bulk.mass;
@@ -88,8 +95,6 @@ export default class Block {
       y: impulse * collisionNormal.y,
     };
 
-    const minImpulse = 0.5; // Minimum impulse to apply
-    const impluseScaler = 10000;
     const appliedImpulseX = Math.sign(impulseVector.x) * Math.max(Math.abs(impulseVector.x), minImpulse) * impluseScaler;
     const appliedImpulseY = Math.sign(impulseVector.y) * Math.max(Math.abs(impulseVector.y), minImpulse) * impluseScaler;
 
@@ -99,9 +104,7 @@ export default class Block {
     bulk.velocityY -= appliedImpulseY * (1 / bulk.mass);
 
     // Prevent objects from sinking into each other
-    const percent = 0.2; // usually 20% to 80%
-    const slop = 0.01; // usually 0.01 to 0.1
-    const correction = (Math.max(velocityAlongNormal - slop, 0) / totalMass) * percent;
+    const correction = (Math.max(velocityAlongNormal - slop, 0) / totalMass) * correctionPercent;
     const correctionVector = {
       x: collisionNormal.x * correction,
       y: collisionNormal.y * correction,
@@ -117,9 +120,41 @@ export default class Block {
     this.velocityY = MathUtils.clamp(this.velocityY, -this.maxSpeed, this.maxSpeed);
     bulk.velocityX = MathUtils.clamp(bulk.velocityX, -bulk.maxSpeed, bulk.maxSpeed);
     bulk.velocityY = MathUtils.clamp(bulk.velocityY, -bulk.maxSpeed, bulk.maxSpeed);
+
+    // this.resolveThisCollision(bulk);
+  }
+
+  resolveThisCollision(bulk) {
+    const thisRect = this.getRect();
+    const bulkRect = bulk.getRect();
+
+    // Calculate overlap on each axis
+    const overlapX = Math.min(Math.abs(thisRect.x + thisRect.width - bulkRect.x), Math.abs(bulkRect.x + bulkRect.width - thisRect.x));
+    const overlapY = Math.min(Math.abs(thisRect.y + thisRect.height - bulkRect.y), Math.abs(bulkRect.y + bulkRect.height - thisRect.y));
+
+    // Determine which axis has the smaller overlap
+    if (overlapX < overlapY) {
+      // Collision on X-axis
+      if (this.x < bulk.x) {
+        this.x = bulk.x - this.size / 2;
+      } else {
+        this.x = bulk.x + bulk.size + this.size / 2;
+      }
+    } else {
+      // Collision on Y-axis
+      if (this.y < bulk.y) {
+        this.y = bulk.y - this.size / 2;
+      } else {
+        this.y = bulk.y + bulk.size + this.size / 2;
+      }
+    }
   }
 
   update(canvasWidth, canvasHeight, player, blocks) {
+    // store location before update
+    this.prevX = this.x;
+    this.prevY = this.y;
+
     // Update position
     this.x += this.velocityX;
     this.y += this.velocityY;
