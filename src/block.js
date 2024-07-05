@@ -15,7 +15,16 @@ export default class Block {
     this.acceleration = 0.1;
     this.maxSpeed = size * 0.4;
     this.friction = 0.85;
-    this.mass = size * size * 10; // Mass proportional to size
+    this.mass = size * size * 2; // Mass proportional to size
+  }
+
+  getRect() {
+    return {
+      x: this.x,
+      y: this.y,
+      width: this.size,
+      height: this.size,
+    };
   }
 
   loadBlockSVG() {

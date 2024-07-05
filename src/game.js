@@ -52,15 +52,14 @@ function gameLoop() {
   ctx.fillStyle = backgroundColor;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Update player
+  // Update
   player.update(keys, canvas.width, canvas.height, level);
-
-  // Update and draw the level
   level.update(player);
-  level.draw(ctx);
+  player.lateUpdate(keys, canvas.width, canvas.height, level);
 
-  // Draw player
+  // draw
   player.draw(ctx);
+  level.draw(ctx);
 
   // Request next frame
   requestAnimationFrame(gameLoop);
