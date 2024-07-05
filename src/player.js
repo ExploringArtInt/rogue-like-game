@@ -12,6 +12,7 @@ export default class Player {
     this.acceleration = 0.1;
     this.maxSpeed = size * 0.4;
     this.friction = 0.85;
+    this.mass = size * size; // Mass proportional to size
     this.svgImage = null;
     this.loadPlayerSVG();
   }
@@ -52,11 +53,11 @@ export default class Player {
     this.x += this.velocityX;
     this.y += this.velocityY;
 
-    // Keep player within canvas bounds and avoid colliding with blocks
+    // Keep player within canvas bounds
     this.x = MathUtils.clamp(this.x, this.size / 2, canvasWidth - this.size / 2);
     this.y = MathUtils.clamp(this.y, this.size / 2, canvasHeight - this.size / 2);
 
-    level.checkCollisions(this);
+    // Collision checking is now handled by the Level class
   }
 
   draw(ctx) {
