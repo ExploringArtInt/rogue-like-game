@@ -48,12 +48,4 @@ export default class Level {
       block.update(this.width, this.height, player, this.blocks);
     }
   }
-
-  checkCollisions(player) {
-    for (const block of this.blocks) {
-      if (block.checkCollision(player)) {
-        block.resolveCollision(player);
-      }
-    }
-  }
 }

@@ -2,8 +2,7 @@ import { MathUtils, Vector, Collision } from "./utilities.js";
 import { loadSVG } from "./svg.js";
 
 export default class Bulk {
-  constructor(x, y, size, color, svgPath) {
-    this.originIsCenter = false;
+  constructor(x, y, size, color, svgPath, isOriginCenter = false) {
     this.x = x;
     this.y = y;
     this.prevX = this.x;
@@ -15,22 +14,28 @@ export default class Bulk {
     this.acceleration = 0.1;
     this.maxSpeed = size * 0.4;
     this.friction = 0.85;
-    this.mass = size * size; // Mass proportional to size
+    this.mass = size * size;
     this.svgImage = null;
+    this.isOriginCenter = isOriginCenter;
     this.loadSVG(svgPath);
   }
 
   getRect() {
-    var x, y;
-
-    if (this.originIsCenter) {
-      x = this.x - this.size / 2;
-      y = this.y - this.size / 2;
+    if (this.isOriginCenter) {
+      return {
+        x: this.x - this.size / 2,
+        y: this.y - this.size / 2,
+        width: this.size,
+        height: this.size,
+      };
     } else {
-      x = this.x;
-      y = this.y;
+      return {
+        x: this.x,
+        y: this.y,
+        width: this.size,
+        height: this.size,
+      };
     }
-    return { x, y, width: this.size, height: this.size };
   }
 
   loadSVG(svgPath) {
@@ -43,7 +48,7 @@ export default class Bulk {
 
   draw(ctx) {
     if (this.svgImage && this.svgImage.complete) {
-      if (this.originIsCenter) {
+      if (this.isOriginCenter) {
         ctx.drawImage(this.svgImage, this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
       } else {
         ctx.drawImage(this.svgImage, this.x, this.y, this.size, this.size);
@@ -52,20 +57,16 @@ export default class Bulk {
   }
 
   update(canvasWidth, canvasHeight) {
-    // store location for late update
     this.prevX = this.x;
     this.prevY = this.y;
 
-    // Update position
     this.x += this.velocityX;
     this.y += this.velocityY;
 
-    // Apply friction
     this.velocityX *= this.friction;
     this.velocityY *= this.friction;
 
-    // Keep bulk within canvas bounds
-    if (this.originIsCenter) {
+    if (this.isOriginCenter) {
       this.x = MathUtils.clamp(this.x, this.size / 2, canvasWidth - this.size / 2);
       this.y = MathUtils.clamp(this.y, this.size / 2, canvasHeight - this.size / 2);
     } else {
@@ -74,97 +75,88 @@ export default class Bulk {
     }
   }
 
-  checkCollisionBulk(other) {
+  checkCollision(other) {
     return Collision.rectIntersect(this.getRect(), other.getRect());
   }
 
-  resolveCollisionBulk(other) {
-    // Calculate bounciness (restitution)
+  resolveCollision(other) {
     const bounciness = 0.1;
     const minImpulse = 0.1;
-    const impluseScaler = 10000;
-    const correctionPercent = 0;
-    const slop = 0;
+    const impulseScaler = 10000;
 
-    // Calculate collision vector
+    const thisCenter = this.getCenter();
+    const otherCenter = other.getCenter();
+
     const collisionVector = {
-      x: this.x - other.x,
-      y: this.y - other.y,
+      x: thisCenter.x - otherCenter.x,
+      y: thisCenter.y - otherCenter.y,
     };
 
-    // Normalize collision vector
     const collisionNormal = Vector.normalize(collisionVector);
 
-    // Calculate relative velocity
     const relativeVelocity = {
       x: this.velocityX - other.velocityX,
       y: this.velocityY - other.velocityY,
     };
 
-    // Calculate relative velocity in terms of the normal direction
     const velocityAlongNormal = Vector.dotProduct(relativeVelocity, collisionNormal);
 
-    // Calculate impulse scalar
     const impulseScalar = -(1 + bounciness) * velocityAlongNormal;
     const totalMass = this.mass + other.mass;
     const impulse = impulseScalar / totalMass;
 
-    // Apply impulse to velocities
     const impulseVector = {
       x: impulse * collisionNormal.x,
       y: impulse * collisionNormal.y,
     };
 
-    const appliedImpulseX = Math.sign(impulseVector.x) * Math.max(Math.abs(impulseVector.x), minImpulse) * impluseScaler;
-    const appliedImpulseY = Math.sign(impulseVector.y) * Math.max(Math.abs(impulseVector.y), minImpulse) * impluseScaler;
+    const appliedImpulseX = Math.sign(impulseVector.x) * Math.max(Math.abs(impulseVector.x), minImpulse) * impulseScaler;
+    const appliedImpulseY = Math.sign(impulseVector.y) * Math.max(Math.abs(impulseVector.y), minImpulse) * impulseScaler;
 
     this.velocityX += appliedImpulseX * (1 / this.mass);
     this.velocityY += appliedImpulseY * (1 / this.mass);
     other.velocityX -= appliedImpulseX * (1 / other.mass);
     other.velocityY -= appliedImpulseY * (1 / other.mass);
 
-    // Prevent objects from sinking into each other
-    const correction = (Math.max(velocityAlongNormal - slop, 0) / totalMass) * correctionPercent;
-    const correctionVector = {
-      x: collisionNormal.x * correction,
-      y: collisionNormal.y * correction,
-    };
-
-    this.x += correctionVector.x * this.mass;
-    this.y += correctionVector.y * this.mass;
-    other.x -= correctionVector.x * other.mass;
-    other.y -= correctionVector.y * other.mass;
-
-    // Ensure velocities don't exceed maxSpeed
     this.velocityX = MathUtils.clamp(this.velocityX, -this.maxSpeed, this.maxSpeed);
     this.velocityY = MathUtils.clamp(this.velocityY, -this.maxSpeed, this.maxSpeed);
     other.velocityX = MathUtils.clamp(other.velocityX, -other.maxSpeed, other.maxSpeed);
     other.velocityY = MathUtils.clamp(other.velocityY, -other.maxSpeed, other.maxSpeed);
+
+    this.resolveOverlap(other);
   }
 
-  resolveOverlapBulk(other) {
+  resolveOverlap(other) {
     const thisRect = this.getRect();
     const otherRect = other.getRect();
 
-    // Calculate overlap on each axis
-    const overlapX = Math.min(Math.abs(thisRect.x + thisRect.width - otherRect.x), Math.abs(otherRect.x + otherRect.width - thisRect.x));
-    const overlapY = Math.min(Math.abs(thisRect.y + thisRect.height - otherRect.y), Math.abs(otherRect.y + otherRect.height - thisRect.y));
+    const overlapX = Math.min(thisRect.x + thisRect.width - otherRect.x, otherRect.x + otherRect.width - thisRect.x);
+    const overlapY = Math.min(thisRect.y + thisRect.height - otherRect.y, otherRect.y + otherRect.height - thisRect.y);
 
-    // Determine which axis has the smaller overlap
     if (overlapX < overlapY) {
-      // Collision on X-axis
-      if (this.x < other.x) {
-        this.x = other.x - this.size / 2;
+      if (this.getCenter().x < other.getCenter().x) {
+        this.x -= overlapX / 2;
+        other.x += overlapX / 2;
       } else {
-        this.x = other.x + other.size + this.size / 2;
+        this.x += overlapX / 2;
+        other.x -= overlapX / 2;
       }
     } else {
-      // Collision on Y-axis
-      if (this.y < other.y) {
-        this.y = other.y - this.size / 2;
+      if (this.getCenter().y < other.getCenter().y) {
+        this.y -= overlapY / 2;
+        other.y += overlapY / 2;
       } else {
-        this.y = other.y + other.size + this.size / 2;
+        this.y += overlapY / 2;
+        other.y -= overlapY / 2;
       }
+    }
+  }
+
+  getCenter() {
+    if (this.isOriginCenter) {
+      return { x: this.x, y: this.y };
+    } else {
+      return { x: this.x + this.size / 2, y: this.y + this.size / 2 };
     }
   }
 }
