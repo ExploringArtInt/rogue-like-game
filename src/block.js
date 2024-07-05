@@ -17,7 +17,7 @@ export default class Block {
     this.acceleration = 0.1;
     this.maxSpeed = size * 0.4;
     this.friction = 0.85;
-    this.mass = size * size; // Mass proportional to size
+    this.mass = size * size * 2; // Mass proportional to size
   }
 
   getRect() {
@@ -51,12 +51,12 @@ export default class Block {
     );
   }
 
-  resolveCollision(bulk) {
+  resolveCollision(bulk, resolveOverlapFlag) {
     // bulk could be the player or another block
 
     // Calculate bounciness (restitution)
-    const bounciness = 0.1;
-    const minImpulse = 0.1; // Minimum impulse to apply
+    const bounciness = 0.1; // normal value is 0.1
+    const minImpulse = 0.1; // normal value is 0.1 Minimum impulse to apply
     const impluseScaler = 10000;
     const correctionPercent = 0; // refactor out?
     const slop = 0; // refactor out?
@@ -78,11 +78,6 @@ export default class Block {
 
     // Calculate relative velocity in terms of the normal direction
     const velocityAlongNormal = Vector.dotProduct(relativeVelocity, collisionNormal);
-
-    // Do not resolve if velocities are separating
-    if (velocityAlongNormal > 0) {
-      return;
-    }
 
     // Calculate impulse scalar
     const impulseScalar = -(1 + bounciness) * velocityAlongNormal;
@@ -121,32 +116,25 @@ export default class Block {
     bulk.velocityX = MathUtils.clamp(bulk.velocityX, -bulk.maxSpeed, bulk.maxSpeed);
     bulk.velocityY = MathUtils.clamp(bulk.velocityY, -bulk.maxSpeed, bulk.maxSpeed);
 
-    // this.resolveOverlap(bulk);
+    if (resolveOverlapFlag) {
+      this.resolveOverlap(bulk);
+    }
   }
 
   resolveOverlap(bulk) {
-    const thisRect = this.getRect();
-    const bulkRect = bulk.getRect();
-
-    // Calculate overlap on each axis
-    const overlapX = Math.min(Math.abs(thisRect.x + thisRect.width - bulkRect.x), Math.abs(bulkRect.x + bulkRect.width - thisRect.x));
-    const overlapY = Math.min(Math.abs(thisRect.y + thisRect.height - bulkRect.y), Math.abs(bulkRect.y + bulkRect.height - thisRect.y));
-
-    // Determine which axis has the smaller overlap
-    if (overlapX < overlapY) {
-      // Collision on X-axis
-      if (this.x < bulk.x) {
-        this.x = bulk.x - this.size / 2;
-      } else {
-        this.x = bulk.x + bulk.size + this.size / 2;
-      }
+    if (this.x < bulk.x) {
+      this.x -= 1;
+      bulk.x += 1;
     } else {
-      // Collision on Y-axis
-      if (this.y < bulk.y) {
-        this.y = bulk.y - this.size / 2;
-      } else {
-        this.y = bulk.y + bulk.size + this.size / 2;
-      }
+      this.x += 1;
+      bulk.x -= 1;
+    }
+    if (this.y < bulk.y) {
+      this.y -= 1;
+      bulk.y += 1;
+    } else {
+      this.y += 1;
+      bulk.y -= 1;
     }
   }
 
@@ -169,17 +157,17 @@ export default class Block {
 
     // Enable player to move this block
     if (this.checkCollision(player)) {
-      this.resolveCollision(player);
+      this.resolveCollision(player, false);
     }
 
     // Check collision with other blocks
     for (const block of blocks) {
       if (block !== this) {
+        // margin of 1 very important for very bounce environments
         if (
           Collision.rectIntersectOverMargin({ x: this.x, y: this.y, width: this.size, height: this.size }, { x: block.x, y: block.y, width: block.size, height: block.size }, 1)
         ) {
-          console.debug("Block collision happened!");
-          this.resolveCollision(block);
+          this.resolveCollision(block, true);
         }
       }
     }
