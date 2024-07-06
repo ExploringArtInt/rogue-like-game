@@ -134,7 +134,7 @@ export default class GUI {
           this.saveGame();
         });
         const restoreGameButton = this.createActionButton("Restore Game", () => {
-          console.log("Restore Game button clicked");
+          this.restoreGame();
         });
         const deleteAllButton = this.createActionButton("Delete All", () => {
           this.deleteAll();
@@ -169,6 +169,24 @@ export default class GUI {
     } catch (error) {
       console.error("Failed to save game:", error);
       this.showMessage("Failed to save game");
+    }
+  }
+
+  restoreGame() {
+    const savedState = Cookie.get("gameState");
+    if (savedState) {
+      try {
+        this.game.gameState.fromJSON(savedState);
+        console.log("Game restored successfully");
+        this.showMessage("Game restored successfully");
+        this.updateGameMenuScreen();
+        this.closeScreen();
+      } catch (error) {
+        console.error("Failed to restore game:", error);
+        this.showMessage("Failed to restore game");
+      }
+    } else {
+      this.showMessage("No saved game found");
     }
   }
 
