@@ -46,12 +46,12 @@ export default class Block extends Bulk {
 
     if (distance <= proximityThreshold) {
       if (!this.playerNearby) {
-        console.log("Player is near the door");
+        // console.log("Player is near the door");
         this.playerNearby = true;
       }
     } else {
       if (this.playerNearby) {
-        console.log("Player has left the door's vicinity");
+        // console.log("Player has left the door's vicinity");
         this.playerNearby = false;
       }
     }

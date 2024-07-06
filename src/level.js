@@ -108,9 +108,9 @@ export default class Level {
     if (playerNearDoor !== this.playerNearDoor) {
       this.playerNearDoor = playerNearDoor;
       if (playerNearDoor) {
-        gui.setFocusedElement("Use");
+        gui.setFocusedElement("Use Something");
       } else {
-        gui.clearFocusedElement();
+        gui.clearFocusedElement("Use Something");
       }
     }
   }

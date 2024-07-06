@@ -3,10 +3,10 @@ export default class GUI {
   constructor(game) {
     this.game = game;
     this.menuOptions = [
-      { icon: "gui-hamburger.svg", screen: "Game", label: "Open Game Menu" },
-      { icon: "gui-battery-100.svg", screen: "Battery", label: "Open Battery Menu" },
-      { icon: "gui-plain-circle.svg", screen: "Shield", label: "Open Shield Menu" },
-      { icon: "gui-auto-repair.svg", screen: "Use", label: "Open Use Menu" },
+      { icon: "gui-hamburger.svg", screen: "Game Menu", label: "Open Game Menu" },
+      { icon: "gui-battery-100.svg", screen: "Energy", label: "Open Energy Menu" },
+      { icon: "gui-plain-circle.svg", screen: "Shields", label: "Open Shield Menu" },
+      { icon: "gui-auto-repair.svg", screen: "Use Something", label: "Open Use Menu" },
     ];
     this.activeScreen = null;
     this.menuButtons = [];
@@ -50,7 +50,7 @@ export default class GUI {
       screen.id = `${option.screen.toLowerCase()}-screen`;
 
       const title = document.createElement("h2");
-      title.textContent = `${option.screen} Screen`;
+      title.textContent = `${option.screen}`;
 
       const closeButton = document.createElement("button");
       closeButton.textContent = "Close";
@@ -158,10 +158,16 @@ export default class GUI {
     }
   }
 
-  clearFocusedElement() {
+  clearFocusedElement(optionName) {
+    /*
     const focusedButton = this.menuButtons.find((btn) => btn === document.activeElement);
     if (focusedButton) {
       focusedButton.blur();
+    }
+    */
+    const button = this.menuButtons.find((btn) => btn.getAttribute("data-screen") === optionName);
+    if (button) {
+      button.blur();
     }
   }
 }
