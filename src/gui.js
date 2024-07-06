@@ -114,7 +114,7 @@ export default class GUI {
   createScreens() {
     this.menuOptions.forEach((option) => {
       const screen = document.createElement("div");
-      screen.classList.add("screen", "hidden");
+      screen.classList.add("modal-screen", "hidden");
       screen.id = `${option.screen.toLowerCase().replace(/\s+/g, "-")}-screen`;
 
       const title = document.createElement("h2");
