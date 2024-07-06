@@ -10,11 +10,13 @@ export default class Level {
     this.height = height;
     this.blocks = [];
     this.seed = seed;
+    this.doorPlaced = false;
     this.generateBlocks(this.seed);
   }
 
   generateBlocks(seed) {
     this.blocks = []; // Clear existing blocks
+    this.doorPlaced = false;
     const rng = this.createSeededRandom(seed);
     const { numColumns, numRows, offsetX, offsetY } = this.calculateGridDimensions();
     const gapSize = 0;
@@ -24,10 +26,15 @@ export default class Level {
         if (this.shouldSkipBlock(col, row, numColumns, numRows)) continue;
 
         const position = this.calculateBlockPosition(col, row, offsetX, offsetY);
-        if (this.shouldCreateBlock(rng)) {
-          this.createBlock(position.x, position.y, gapSize);
-        }
+        this.tryCreateBlock(position.x, position.y, gapSize, rng);
       }
+    }
+
+    // If no door was placed, force place it in a random position
+    if (!this.doorPlaced) {
+      const randomIndex = Math.floor(rng() * this.blocks.length);
+      const randomBlock = this.blocks[randomIndex];
+      this.blocks[randomIndex] = new Block(randomBlock.position.x, randomBlock.position.y, this.blockSize - gapSize, this.blockColor, "door");
     }
   }
 
@@ -57,13 +64,27 @@ export default class Level {
     return { x, y };
   }
 
-  shouldCreateBlock(rng) {
-    return rng() > 0.2; // 80% chance of creating a block
+  tryCreateBlock(x, y, gapSize, rng) {
+    if (rng() > 0.2) {
+      // 80% chance of creating a block
+      if (!this.doorPlaced && rng() < 0.1) {
+        // 10% chance of creating a door if not already placed
+        this.createDoor(x, y, gapSize);
+      } else {
+        this.createBlock(x, y, gapSize);
+      }
+    }
   }
 
   createBlock(x, y, gapSize) {
-    const block = new Block(x, y, this.blockSize - gapSize, this.blockColor);
+    const block = new Block(x, y, this.blockSize - gapSize, this.blockColor, "normal");
     this.blocks.push(block);
+  }
+
+  createDoor(x, y, gapSize) {
+    const door = new Block(x, y, this.blockSize - gapSize, this.blockColor, "door");
+    this.blocks.push(door);
+    this.doorPlaced = true;
   }
 
   draw(ctx) {
@@ -71,7 +92,12 @@ export default class Level {
   }
 
   update(player) {
-    this.blocks.forEach((block) => block.update(this.width, this.height, player, this.blocks));
+    this.blocks.forEach((block) => {
+      block.update(this.width, this.height, player, this.blocks);
+      if (block.type === "door") {
+        block.checkDoorUse(player);
+      }
+    });
   }
 
   // Method to regenerate the level with a new seed
