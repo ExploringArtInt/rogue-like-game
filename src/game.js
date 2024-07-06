@@ -2,6 +2,7 @@
 import Player from "./player.js";
 import Level from "./level.js";
 import GUI from "./gui.js";
+import GameState from "./gameState.js";
 
 class Game {
   constructor() {
@@ -11,7 +12,7 @@ class Game {
     this.playerColor = "#DDDDDD";
     this.blockColor = "#000000";
 
-    this.currentLevelNumber = 1; // Initialize the level number
+    this.gameState = new GameState(); // Initialize the game state
 
     this.setupCanvas();
     this.setupEventListeners();
@@ -64,11 +65,10 @@ class Game {
 
     this.player = new Player(this.canvas.width / 2, this.canvas.height / 2, playerSize, this.playerColor);
 
-    const levelSeed = this.currentLevelNumber * 1000 + Date.now();
-    this.level = new Level(this.blockColor, blockSize, this.canvas.width, this.canvas.height, levelSeed);
+    this.level = new Level(this.blockColor, blockSize, this.canvas.width, this.canvas.height, this.gameState.currentSeed);
 
     this.gui = new GUI(this);
-    this.gui.updateLevelDisplay(this.currentLevelNumber); // Update the level display
+    this.gui.updateLevelDisplay(this.gameState.currentLevel);
   }
 
   update() {
@@ -111,8 +111,7 @@ class Game {
   }
 
   goToNextLevel() {
-    this.currentLevelNumber++;
-    const levelSeed = this.currentLevelNumber * 1000 + Date.now();
+    this.gameState.incrementLevel();
 
     // Reset player position
     this.player.position.x = this.canvas.width / 2;
@@ -121,12 +120,12 @@ class Game {
 
     // Generate new level
     const blockSize = Math.min(this.canvas.width * 0.15, this.canvas.height * 0.15);
-    this.level = new Level(this.blockColor, blockSize, this.canvas.width, this.canvas.height, levelSeed);
+    this.level = new Level(this.blockColor, blockSize, this.canvas.width, this.canvas.height, this.gameState.currentSeed);
 
     // Update GUI to show new level number
-    this.gui.updateLevelDisplay(this.currentLevelNumber);
+    this.gui.updateLevelDisplay(this.gameState.currentLevel);
 
-    console.log(`Entered level ${this.currentLevelNumber}`);
+    console.log(`Entered level ${this.gameState.currentLevel}`);
   }
 }
 
