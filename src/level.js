@@ -3,16 +3,19 @@ import { MathUtils } from "./utilities.js";
 import Block from "./block.js";
 
 export default class Level {
-  constructor(blockColor, blockSize, width, height) {
+  constructor(blockColor, blockSize, width, height, seed = Date.now()) {
     this.blockColor = blockColor;
     this.blockSize = blockSize;
     this.width = width;
     this.height = height;
     this.blocks = [];
-    this.generateBlocks();
+    this.seed = seed;
+    this.generateBlocks(this.seed);
   }
 
-  generateBlocks() {
+  generateBlocks(seed) {
+    this.blocks = []; // Clear existing blocks
+    const rng = this.createSeededRandom(seed);
     const { numColumns, numRows, offsetX, offsetY } = this.calculateGridDimensions();
     const gapSize = 0;
 
@@ -21,11 +24,19 @@ export default class Level {
         if (this.shouldSkipBlock(col, row, numColumns, numRows)) continue;
 
         const position = this.calculateBlockPosition(col, row, offsetX, offsetY);
-        if (this.shouldCreateBlock()) {
+        if (this.shouldCreateBlock(rng)) {
           this.createBlock(position.x, position.y, gapSize);
         }
       }
     }
+  }
+
+  createSeededRandom(seed) {
+    let x = seed;
+    return function () {
+      x = Math.sin(x) * 10000;
+      return x - Math.floor(x);
+    };
   }
 
   calculateGridDimensions() {
@@ -46,8 +57,8 @@ export default class Level {
     return { x, y };
   }
 
-  shouldCreateBlock() {
-    return MathUtils.randomInt(0, 5) > 0;
+  shouldCreateBlock(rng) {
+    return rng() > 0.2; // 80% chance of creating a block
   }
 
   createBlock(x, y, gapSize) {
@@ -61,5 +72,11 @@ export default class Level {
 
   update(player) {
     this.blocks.forEach((block) => block.update(this.width, this.height, player, this.blocks));
+  }
+
+  // Method to regenerate the level with a new seed
+  regenerate(newSeed = Date.now()) {
+    this.seed = newSeed;
+    this.generateBlocks(this.seed);
   }
 }

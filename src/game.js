@@ -61,7 +61,11 @@ class Game {
     const blockSize = Math.min(this.canvas.width * 0.15, this.canvas.height * 0.15);
 
     this.player = new Player(this.canvas.width / 2, this.canvas.height / 2, playerSize, this.playerColor);
-    this.level = new Level(this.blockColor, blockSize, this.canvas.width, this.canvas.height);
+
+    // Use a specific seed for reproducible levels, or omit for random levels
+    const levelSeed = 123; // You can change this value or remove it for random levels
+    this.level = new Level(this.blockColor, blockSize, this.canvas.width, this.canvas.height, levelSeed);
+
     this.gui = new GUI(this);
   }
 
