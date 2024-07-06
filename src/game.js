@@ -25,6 +25,8 @@ class Game {
       KeyS: false,
       KeyD: false,
     };
+
+    this.isPaused = false;
   }
 
   setupCanvas() {
@@ -48,13 +50,13 @@ class Game {
   }
 
   handleKeyDown(event) {
-    if (this.keys.hasOwnProperty(event.code)) {
+    if (this.keys.hasOwnProperty(event.code) && !this.isPaused) {
       this.keys[event.code] = true;
     }
   }
 
   handleKeyUp(event) {
-    if (this.keys.hasOwnProperty(event.code)) {
+    if (this.keys.hasOwnProperty(event.code) && !this.isPaused) {
       this.keys[event.code] = false;
     }
   }
@@ -69,9 +71,11 @@ class Game {
   }
 
   update() {
-    this.player.update(this.keys, this.canvas.width, this.canvas.height, this.level);
-    this.level.update(this.player);
-    this.player.lateUpdate(this.keys, this.canvas.width, this.canvas.height, this.level);
+    if (!this.isPaused) {
+      this.player.update(this.keys, this.canvas.width, this.canvas.height, this.level);
+      this.level.update(this.player);
+      this.player.lateUpdate(this.keys, this.canvas.width, this.canvas.height, this.level);
+    }
   }
 
   draw() {
@@ -95,6 +99,16 @@ class Game {
 
   start() {
     this.gameLoop();
+  }
+
+  setPaused(isPaused) {
+    this.isPaused = isPaused;
+    // Reset all key states when pausing/unpausing
+    if (isPaused) {
+      for (let key in this.keys) {
+        this.keys[key] = false;
+      }
+    }
   }
 }
 

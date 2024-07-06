@@ -84,8 +84,7 @@ export default class GUI {
       });
 
       button.addEventListener("click", () => {
-        this.activeScreen = option.screen;
-        this.draw();
+        this.setActiveScreen(option.screen);
       });
 
       button.addEventListener("mouseover", () => {
@@ -125,15 +124,14 @@ export default class GUI {
     if (y > this.canvas.height - this.menuHeight) {
       const optionWidth = this.canvas.width / this.menuOptions.length;
       const clickedOption = Math.floor(x / optionWidth);
-      this.activeScreen = this.menuOptions[clickedOption].screen;
+      this.setActiveScreen(this.menuOptions[clickedOption].screen);
     } else if (this.activeScreen) {
       const cancelIconSize = 30;
       const padding = 10;
       if (x > this.canvas.width - cancelIconSize - padding && y < cancelIconSize + padding) {
-        this.activeScreen = null;
+        this.setActiveScreen(null);
       }
     }
-    this.draw();
   }
 
   handleKeyDown(event) {
@@ -147,15 +145,19 @@ export default class GUI {
       this.menuContainer.children[this.focusedOption].focus();
     } else if (event.key === "Enter" || event.key === " ") {
       if (this.focusedOption !== null) {
-        this.activeScreen = this.menuOptions[this.focusedOption].screen;
+        this.setActiveScreen(this.menuOptions[this.focusedOption].screen);
       } else if (this.activeScreen) {
-        this.activeScreen = null;
+        this.setActiveScreen(null);
       }
-      this.draw();
     } else if (event.key === "Escape" && this.activeScreen) {
-      this.activeScreen = null;
-      this.draw();
+      this.setActiveScreen(null);
     }
+  }
+
+  setActiveScreen(screen) {
+    this.activeScreen = screen;
+    this.game.setPaused(screen !== null);
+    this.draw();
   }
 
   draw() {
