@@ -11,6 +11,8 @@ class Game {
     this.playerColor = "#DDDDDD";
     this.blockColor = "#000000";
 
+    this.currentLevelNumber = 1; // Initialize the level number
+
     this.setupCanvas();
     this.setupEventListeners();
     this.initializeGameObjects();
@@ -62,11 +64,11 @@ class Game {
 
     this.player = new Player(this.canvas.width / 2, this.canvas.height / 2, playerSize, this.playerColor);
 
-    // Use a specific seed for reproducible levels, or omit for random levels
-    const levelSeed = 123; // You can change this value or remove it for random levels
+    const levelSeed = this.currentLevelNumber * 1000 + Date.now();
     this.level = new Level(this.blockColor, blockSize, this.canvas.width, this.canvas.height, levelSeed);
 
     this.gui = new GUI(this);
+    this.gui.updateLevelDisplay(this.currentLevelNumber); // Update the level display
   }
 
   update() {
@@ -79,12 +81,11 @@ class Game {
 
   draw() {
     this.clearCanvas();
-    this.player.draw(this.ctx);
     this.level.draw(this.ctx);
+    this.player.draw(this.ctx);
   }
 
   clearCanvas() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.fillStyle = this.backgroundColor;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
@@ -107,6 +108,25 @@ class Game {
         this.keys[key] = false;
       }
     }
+  }
+
+  goToNextLevel() {
+    this.currentLevelNumber++;
+    const levelSeed = this.currentLevelNumber * 1000 + Date.now();
+
+    // Reset player position
+    this.player.position.x = this.canvas.width / 2;
+    this.player.position.y = this.canvas.height / 2;
+    this.player.velocity = { x: 0, y: 0 };
+
+    // Generate new level
+    const blockSize = Math.min(this.canvas.width * 0.15, this.canvas.height * 0.15);
+    this.level = new Level(this.blockColor, blockSize, this.canvas.width, this.canvas.height, levelSeed);
+
+    // Update GUI to show new level number
+    this.gui.updateLevelDisplay(this.currentLevelNumber);
+
+    console.log(`Entered level ${this.currentLevelNumber}`);
   }
 }
 

@@ -32,10 +32,15 @@ export default class Level {
     }
 
     // If no door was placed, force place it in a random position
-    if (!this.doorPlaced) {
+    if (!this.doorPlaced && this.blocks.length > 0) {
       const randomIndex = Math.floor(rng() * this.blocks.length);
       const randomBlock = this.blocks[randomIndex];
       this.blocks[randomIndex] = this.createDoor(randomBlock.position.x, randomBlock.position.y, gapSize);
+    } else if (!this.doorPlaced) {
+      // If there are no blocks at all, place a door in the center
+      const centerX = this.width / 2 - this.blockSize / 2;
+      const centerY = this.height / 2 - this.blockSize / 2;
+      this.blocks.push(this.createDoor(centerX, centerY, gapSize));
     }
   }
 
@@ -125,5 +130,9 @@ export default class Level {
   regenerate(newSeed = Date.now()) {
     this.seed = newSeed;
     this.generateBlocks(this.seed);
+  }
+
+  isPlayerNearDoor() {
+    return this.playerNearDoor;
   }
 }

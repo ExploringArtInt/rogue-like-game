@@ -14,6 +14,7 @@ export default class GUI {
     this.createMenu();
     this.createScreens();
     this.setupKeyboardNavigation();
+    this.createLevelDisplay();
   }
 
   createMenu() {
@@ -43,32 +44,6 @@ export default class GUI {
     document.body.appendChild(menuContainer);
   }
 
-  createScreens() {
-    this.menuOptions.forEach((option) => {
-      const screen = document.createElement("div");
-      screen.classList.add("screen", "hidden");
-      screen.id = `${option.screen.toLowerCase()}-screen`;
-
-      const title = document.createElement("h2");
-      title.textContent = `${option.screen}`;
-
-      const test = document.createElement("div");
-      test.textContent =
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed lectus nisi, imperdiet id egestas sed, blandit ac ligula. Pellentesque hendrerit lorem ut urna vulputate, ac placerat sem rhoncus. Pellentesque faucibus finibus malesuada..";
-
-      const closeButton = document.createElement("button");
-      closeButton.textContent = "Close";
-      closeButton.classList.add("close-button");
-      closeButton.addEventListener("click", () => this.closeScreen());
-
-      screen.appendChild(title);
-      screen.appendChild(test);
-      screen.appendChild(closeButton);
-
-      document.body.appendChild(screen);
-    });
-  }
-
   setupKeyboardNavigation() {
     document.addEventListener("keydown", (event) => {
       if (event.key === "Tab") {
@@ -92,10 +67,9 @@ export default class GUI {
         button.classList.remove("menu-button-focused");
       });
 
-      // Add keydown event listener to each button
       button.addEventListener("keydown", (event) => {
         if (event.key === "Enter") {
-          event.preventDefault(); // Prevent default Enter key behavior
+          event.preventDefault();
           this.toggleScreen(button.getAttribute("data-screen"));
         }
       });
@@ -127,7 +101,6 @@ export default class GUI {
   }
 
   toggleScreen(screenName) {
-    console.debug("In toggleScreen");
     if (this.activeScreen === screenName) {
       this.closeScreen();
     } else {
@@ -138,17 +111,93 @@ export default class GUI {
     }
   }
 
+  createScreens() {
+    this.menuOptions.forEach((option) => {
+      const screen = document.createElement("div");
+      screen.classList.add("screen", "hidden");
+      screen.id = `${option.screen.toLowerCase().replace(/\s+/g, "-")}-screen`;
+
+      const title = document.createElement("h2");
+      title.textContent = `${option.screen}`;
+
+      const content = document.createElement("div");
+      content.id = `${option.screen.toLowerCase().replace(/\s+/g, "-")}-content`;
+
+      const closeButton = document.createElement("button");
+      closeButton.textContent = "Close";
+      closeButton.classList.add("close-button");
+      closeButton.addEventListener("click", () => this.closeScreen());
+
+      screen.appendChild(title);
+      screen.appendChild(content);
+      screen.appendChild(closeButton);
+
+      document.body.appendChild(screen);
+    });
+  }
+
   openScreen(screenName) {
     this.activeScreen = screenName;
     this.game.setPaused(true);
-    document.getElementById("gameCanvas").classList.add("hidden");
-    document.getElementById(`${screenName.toLowerCase()}-screen`).classList.remove("hidden");
+
+    const gameCanvas = document.getElementById("gameCanvas");
+    if (gameCanvas) {
+      gameCanvas.classList.add("hidden");
+    } else {
+      console.warn("Game canvas element not found");
+    }
+
+    const screen = document.getElementById(`${screenName.toLowerCase().replace(/\s+/g, "-")}-screen`);
+    if (screen) {
+      screen.classList.remove("hidden");
+      if (screenName === "Use Something") {
+        this.updateUseSomethingScreen();
+      }
+    } else {
+      console.error(`Screen not found: ${screenName}`);
+    }
+  }
+
+  updateUseSomethingScreen() {
+    const contentId = "use-something-content";
+    const content = document.getElementById(contentId);
+    if (!content) {
+      console.error(`Element not found: ${contentId}`);
+      return;
+    }
+
+    content.innerHTML = "";
+
+    if (this.game.level.isPlayerNearDoor()) {
+      const enterDoorButton = document.createElement("button");
+      enterDoorButton.textContent = "Enter Door";
+      enterDoorButton.classList.add("action-button");
+      enterDoorButton.addEventListener("click", () => {
+        this.game.goToNextLevel();
+        this.closeScreen();
+      });
+      content.appendChild(enterDoorButton);
+    } else {
+      content.textContent = "No actions available.";
+    }
   }
 
   closeScreen() {
     if (this.activeScreen) {
-      document.getElementById(`${this.activeScreen.toLowerCase()}-screen`).classList.add("hidden");
-      document.getElementById("gameCanvas").classList.remove("hidden");
+      const activeScreenElement = document.getElementById(`${this.activeScreen.toLowerCase().replace(/\s+/g, "-")}-screen`);
+      if (activeScreenElement) {
+        activeScreenElement.classList.add("hidden");
+      } else {
+        console.warn(`Active screen element not found: ${this.activeScreen}`);
+      }
+
+      const gameCanvas = document.getElementById("gameCanvas");
+      if (gameCanvas) {
+        gameCanvas.classList.remove("hidden");
+      } else {
+        console.warn("Game canvas element not found");
+      }
+
       this.activeScreen = null;
       this.game.setPaused(false);
     }
@@ -164,15 +213,26 @@ export default class GUI {
   }
 
   clearFocusedElement(optionName) {
-    /*
-    const focusedButton = this.menuButtons.find((btn) => btn === document.activeElement);
-    if (focusedButton) {
-      focusedButton.blur();
-    }
-    */
     const button = this.menuButtons.find((btn) => btn.getAttribute("data-screen") === optionName);
     if (button) {
       button.blur();
+    }
+  }
+
+  createLevelDisplay() {
+    const levelDisplay = document.createElement("div");
+    levelDisplay.id = "level-display";
+    levelDisplay.classList.add("level-display");
+    document.body.appendChild(levelDisplay);
+    this.updateLevelDisplay(this.game.currentLevelNumber);
+  }
+
+  updateLevelDisplay(levelNumber) {
+    const levelDisplay = document.getElementById("level-display");
+    if (levelDisplay) {
+      levelDisplay.textContent = `Level: ${levelNumber}`;
+    } else {
+      console.warn("Level display element not found");
     }
   }
 }
