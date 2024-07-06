@@ -138,6 +138,15 @@ canvas {
     background-color: rgba(200, 200, 200, 0.5);
 }
 
+p#game-menu-game-state-text {
+    ul {
+        list-style-type: none;
+        li {
+            padding: 10px;
+        }
+    }
+}
+
 .hidden {
     display: none !important;
 }

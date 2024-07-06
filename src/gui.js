@@ -171,7 +171,14 @@ export default class GUI {
   updateGameMenuScreen() {
     const gameStateText = document.getElementById("game-menu-game-state-text");
     if (gameStateText) {
-      gameStateText.textContent = `Current Level: ${this.game.gameState.currentLevel}`;
+      const { currentLevel, playerEnergy, playerHealth, gamesCompleted } = this.game.gameState;
+      gameStateText.innerHTML = `
+          <ul>
+            <li>Current Level: ${currentLevel}</li>
+            <li>Energy: ${playerEnergy}</li>
+            <li>Health: ${playerHealth}</li>
+            <li>Games Completed: ${gamesCompleted}</li>
+          </ul>`;
     }
   }
 
@@ -261,7 +268,9 @@ export default class GUI {
   updateGameStateDisplay(levelNumber) {
     const gameStateDisplay = document.getElementById("game-state-display");
     if (gameStateDisplay) {
-      gameStateDisplay.textContent = `Level: ${levelNumber}`;
+      const { currentLevel } = this.game.gameState;
+      gameStateDisplay.textContent = `
+            Level: ${currentLevel}`;
     } else {
       console.warn("Game state display element not found");
     }
