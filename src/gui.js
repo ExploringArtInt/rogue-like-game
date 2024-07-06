@@ -1,4 +1,6 @@
 // gui.js
+import { Cookie } from "./utilities.js";
+
 export default class GUI {
   constructor(game) {
     this.game = game;
@@ -129,7 +131,7 @@ export default class GUI {
 
         // Add new buttons for save, restore, and delete game
         const saveGameButton = this.createActionButton("Save Game", () => {
-          console.log("Save Game button clicked");
+          this.saveGame();
         });
         const restoreGameButton = this.createActionButton("Restore Game", () => {
           console.log("Restore Game button clicked");
@@ -156,6 +158,28 @@ export default class GUI {
       this.modalButtons.push(closeButton);
     });
     this.updateFocusableElements();
+  }
+
+  saveGame() {
+    const gameState = this.game.gameState.toJSON();
+    try {
+      Cookie.save("gameState", gameState);
+      console.log("Game saved successfully");
+      this.showMessage("Game saved successfully");
+    } catch (error) {
+      console.error("Failed to save game:", error);
+      this.showMessage("Failed to save game");
+    }
+  }
+
+  showMessage(message) {
+    const messageElement = document.createElement("div");
+    messageElement.textContent = message;
+    messageElement.classList.add("message");
+    document.body.appendChild(messageElement);
+    setTimeout(() => {
+      messageElement.remove();
+    }, 3000);
   }
 
   createActionButton(text, onClick) {
