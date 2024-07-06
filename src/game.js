@@ -110,13 +110,15 @@ class Game {
 
     // Check for victory or defeat
     if (this.gameState.isGameWon()) {
-      this.isPaused = true; // Pause the game
-      console.log("Congratulations! You've won the game!");
       this.gui.showMessage("Congratulations! You've won the game!");
-    } else if (this.gameState.isGameLost()) {
+      this.gameState.reset;
+      this.reinitializeGameObjects();
       this.isPaused = true; // Pause the game
-      console.log("Game Over! You've lost the game.");
+    } else if (this.gameState.isGameLost()) {
       this.gui.showMessage("Game Over! You've lost the game.");
+      this.gameState.reset;
+      this.reinitializeGameObjects();
+      this.isPaused = true; // Pause the game
     } else {
       requestAnimationFrame(() => this.gameLoop());
     }

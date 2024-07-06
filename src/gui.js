@@ -189,10 +189,8 @@ export default class GUI {
     const gameState = this.game.gameState.toJSON();
     try {
       Cookie.save("gameState", gameState);
-      console.log("Game saved successfully");
       this.showMessage("Game saved successfully");
     } catch (error) {
-      console.error("Failed to save game:", error);
       this.showMessage("Failed to save game");
     }
   }
@@ -202,7 +200,6 @@ export default class GUI {
     if (savedState) {
       try {
         this.game.gameState.fromJSON(savedState);
-        console.log("Game restored successfully");
         this.game.reinitializeGameObjects();
         this.updateGameMenuScreen();
         this.showMessage("Game restored successfully");
@@ -217,12 +214,16 @@ export default class GUI {
 
   deleteAll() {
     Cookie.toss("gameState");
-    console.log("All saved data deleted");
     this.showMessage("All saved data deleted");
   }
 
   showMessage(message) {
+    console.log(message);
     this.closeScreen();
+    const messageContent = document.getElementById("message-content");
+    if (messageContent) {
+      messageContent.innerHTML = message;
+    }
     this.openScreen("message");
   }
 
