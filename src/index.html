@@ -5,37 +5,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Rogue-like Game</title>
         <link rel="stylesheet" href="styles.css" />
-        <style>
-            body,
-            html {
-                margin: 0;
-                padding: 0;
-                overflow: hidden;
-                background-color: #000000;
-            }
-            canvas {
-                display: block;
-            }
-            .menu-button {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-            .menu-button:hover {
-                background-color: rgba(255, 255, 255, 0.1);
-            }
-            .screen {
-                padding: 20px;
-                box-sizing: border-box;
-            }
-            .menu-icon {
-                filter: invert(100%) brightness(60%);
-                transition: filter 0.3s ease;
-            }
-            .menu-button:hover .menu-icon {
-                filter: invert(100%) brightness(100%);
-            }
-        </style>
     </head>
     <body>
         <canvas id="gameCanvas"></canvas>
