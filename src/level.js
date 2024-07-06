@@ -104,7 +104,8 @@ export default class Level {
     this.blocks.forEach((block) => {
       block.update(this.width, this.height, player, this.blocks);
       if (block.type === "door") {
-        if (this.checkPlayerProximity(player, block)) {
+        block.checkPlayerProximity(player);
+        if (block.playerNearby) {
           playerNearDoor = true;
         }
       }

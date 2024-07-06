@@ -41,8 +41,8 @@ export default class Block extends Bulk {
   }
 
   checkPlayerProximity(player) {
-    const proximityThreshold = this.size * 1.5; // Adjust this value as needed
-    const distance = Math.sqrt(Math.pow(this.position.x - player.position.x, 2) + Math.pow(this.position.y - player.position.y, 2));
+    const proximityThreshold = this.size * 1.2; // Adjust this value as needed
+    const distance = this.calculateDistance(player);
 
     if (distance <= proximityThreshold) {
       if (!this.playerNearby) {
@@ -55,6 +55,19 @@ export default class Block extends Bulk {
         this.playerNearby = false;
       }
     }
+  }
+
+  calculateDistance(player) {
+    // Calculate the center points of the block and player
+    const blockCenterX = this.position.x + this.size / 2;
+    const blockCenterY = this.position.y + this.size / 2;
+    const playerCenterX = player.position.x;
+    const playerCenterY = player.position.y;
+
+    // Calculate the distance between the centers
+    const dx = blockCenterX - playerCenterX;
+    const dy = blockCenterY - playerCenterY;
+    return Math.sqrt(dx * dx + dy * dy);
   }
 
   checkDoorUse(player) {
