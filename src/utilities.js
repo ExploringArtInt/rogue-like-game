@@ -178,31 +178,54 @@ const Debug = {
   },
 };
 
-// Cookie Operations
 const Cookie = {
-  saveToCookie: (name, value, days = 7) => {
-    const expirationDate = new Date();
-    expirationDate.setDate(expirationDate.getDate() + days);
-    const cookieValue = encodeURIComponent(value) + (days === null ? "" : `; expires=${expirationDate.toUTCString()}`);
-    document.cookie = `${name}=${cookieValue}; path=/`;
+  MAX_COOKIE_SIZE: 4096, // bytes
+
+  bake: (name, value, days) => {
+    if (value === undefined || value === null) {
+      throw new Error("Cookie value cannot be undefined or null");
+    }
+
+    let cookieString;
+    try {
+      const stringifiedValue = JSON.stringify(value);
+      const expirationDate = new Date();
+      expirationDate.setDate(expirationDate.getDate() + (days || 0));
+      cookieString = `${name}=${encodeURIComponent(stringifiedValue)}; expires=${expirationDate.toUTCString()}; path=/`;
+    } catch (error) {
+      throw new Error(`Failed to stringify cookie value: ${error.message}`);
+    }
+
+    const size = new TextEncoder().encode(cookieString).length;
+    if (size > Cookie.MAX_COOKIE_SIZE) {
+      throw new Error(`Cookie size (${size} bytes) exceeds maximum allowed size (${Cookie.MAX_COOKIE_SIZE} bytes)`);
+    }
+
+    return cookieString;
   },
 
-  getFromCookie: (name) => {
+  save: (name, value, days = 400) => {
+    try {
+      const cookieString = Cookie.bake(name, value, days);
+      document.cookie = cookieString;
+    } catch (error) {
+      console.error(`Failed to save cookie: ${error.message}`);
+    }
+  },
+
+  get: (name) => {
     const nameEQ = `${name}=`;
     const cookieArray = document.cookie.split(";");
     for (let i = 0; i < cookieArray.length; i++) {
-      let cookie = cookieArray[i];
-      while (cookie.charAt(0) === " ") {
-        cookie = cookie.substring(1, cookie.length);
-      }
+      let cookie = cookieArray[i].trim();
       if (cookie.indexOf(nameEQ) === 0) {
-        return decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
+        return JSON.parse(decodeURIComponent(cookie.substring(nameEQ.length, cookie.length)));
       }
     }
     return null;
   },
 
-  clearCookie: (name) => {
+  toss: (name) => {
     document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
   },
 };
