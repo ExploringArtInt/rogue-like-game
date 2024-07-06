@@ -52,12 +52,17 @@ export default class GUI {
       const title = document.createElement("h2");
       title.textContent = `${option.screen}`;
 
+      const test = document.createElement("div");
+      test.textContent =
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed lectus nisi, imperdiet id egestas sed, blandit ac ligula. Pellentesque hendrerit lorem ut urna vulputate, ac placerat sem rhoncus. Pellentesque faucibus finibus malesuada..";
+
       const closeButton = document.createElement("button");
       closeButton.textContent = "Close";
       closeButton.classList.add("close-button");
       closeButton.addEventListener("click", () => this.closeScreen());
 
       screen.appendChild(title);
+      screen.appendChild(test);
       screen.appendChild(closeButton);
 
       document.body.appendChild(screen);

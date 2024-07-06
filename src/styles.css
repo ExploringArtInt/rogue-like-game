@@ -21,15 +21,19 @@ html {
     overflow: hidden;
     background-color: #000000;
     font-family: "Comfortaa Medium", sans-serif;
+    font-size: 1.2em;
 }
 
 h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h2 {
     font-family: "Comfortaa Bold", sans-serif;
+}
+
+h1 {
+    font-size: 2.5em;
+}
+h2 {
+    font-size: 2em;
 }
 
 canvas {
@@ -100,7 +104,7 @@ canvas {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 60px;
     box-sizing: border-box;
     z-index: 3;
 }
@@ -108,7 +112,8 @@ canvas {
 .close-button {
     margin-top: 20px;
     font-family: "Comfortaa Medium", sans-serif;
-    padding: 10px 20px; /* Added padding */
+    font-size: 1.5em;
+    padding: 20px 40px; /* Added padding */
     cursor: pointer; /* Added for better UX */
     background-color: #333; /* Added for visibility */
     color: white; /* Added for contrast */
