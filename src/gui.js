@@ -14,8 +14,8 @@ export default class GUI {
     ];
     this.menuHeight = 80;
     this.iconSize = 40;
-    this.menuBackgroundColor = "rgba(0, 0, 0, 0.5)";
-    this.menuHighlightColor = "rgba(255, 255, 255, 0.3)";
+    this.menuBackgroundColor = "rgb(0 0 0 / 50%)"; // Default background color
+    this.menuHighlightColor = "rgb(0 0 0 / 0%)"; // Hover background color
     this.lineColor = "rgba(255, 255, 255, 0.8)";
     this.textColor = "white";
     this.activeScreen = null;
@@ -68,9 +68,10 @@ export default class GUI {
       button.setAttribute("aria-label", option.label);
       button.style.flex = "1";
       button.style.border = "none";
-      button.style.background = "none";
+      button.style.background = this.menuBackgroundColor;
       button.style.cursor = "pointer";
       button.style.outline = "none";
+      button.style.transition = "background-color 0.3s";
 
       button.addEventListener("focus", () => {
         this.focusedOption = index;
@@ -85,6 +86,14 @@ export default class GUI {
       button.addEventListener("click", () => {
         this.activeScreen = option.screen;
         this.draw();
+      });
+
+      button.addEventListener("mouseover", () => {
+        button.style.backgroundColor = this.menuHighlightColor;
+      });
+
+      button.addEventListener("mouseout", () => {
+        button.style.backgroundColor = this.menuBackgroundColor;
       });
 
       menuContainer.appendChild(button);
@@ -163,20 +172,14 @@ export default class GUI {
     // Clear the menu area
     ctx.clearRect(0, this.canvas.height - this.menuHeight, this.canvas.width, this.menuHeight);
 
-    // Draw menu background
-    ctx.fillStyle = this.menuBackgroundColor;
-    ctx.fillRect(0, this.canvas.height - this.menuHeight, this.canvas.width, this.menuHeight);
-
     // Draw options
     this.menuOptions.forEach((option, index) => {
       const x = index * optionWidth;
       const y = this.canvas.height - this.menuHeight;
 
-      // Draw highlight if hovered or focused
-      if (index === this.hoveredOption || index === this.focusedOption) {
-        ctx.fillStyle = this.menuHighlightColor;
-        ctx.fillRect(x, y, optionWidth, this.menuHeight);
-      }
+      // Draw background
+      ctx.fillStyle = index === this.hoveredOption || index === this.focusedOption ? this.menuHighlightColor : this.menuBackgroundColor;
+      ctx.fillRect(x, y, optionWidth, this.menuHeight);
 
       // Draw icon
       if (this.icons[option.icon]) {
