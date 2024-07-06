@@ -33,7 +33,7 @@ export default class GUI {
       button.appendChild(icon);
       menuContainer.appendChild(button);
 
-      button.addEventListener("click", () => this.openScreen(option.screen));
+      button.addEventListener("click", () => this.toggleScreen(option.screen));
     });
 
     document.body.appendChild(menuContainer);
@@ -42,7 +42,7 @@ export default class GUI {
   createScreens() {
     this.menuOptions.forEach((option) => {
       const screen = document.createElement("div");
-      screen.classList.add("screen", "hidden"); // Add 'hidden' class by default
+      screen.classList.add("screen", "hidden");
       screen.id = `${option.screen.toLowerCase()}-screen`;
 
       const title = document.createElement("h2");
@@ -58,6 +58,19 @@ export default class GUI {
 
       document.body.appendChild(screen);
     });
+  }
+
+  toggleScreen(screenName) {
+    if (this.activeScreen === screenName) {
+      // If clicking on the currently open screen, close it
+      this.closeScreen();
+    } else {
+      // If a different screen is requested, close the current one (if any) and open the new one
+      if (this.activeScreen) {
+        this.closeScreen();
+      }
+      this.openScreen(screenName);
+    }
   }
 
   openScreen(screenName) {
