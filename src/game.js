@@ -35,6 +35,11 @@ class Game {
   resizeCanvas() {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
+    // Update the position of the accessible menu
+    if (this.gui && this.gui.menuContainer) {
+      this.gui.menuContainer.style.bottom = "0";
+      this.gui.menuContainer.style.width = `${this.canvas.width}px`;
+    }
   }
 
   setupEventListeners() {
