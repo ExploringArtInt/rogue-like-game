@@ -1,6 +1,7 @@
 // game.js
 import Player from "./player.js";
 import Level from "./level.js";
+import GUI from "./gui.js";
 
 class Game {
   constructor() {
@@ -59,6 +60,7 @@ class Game {
 
     this.player = new Player(this.canvas.width / 2, this.canvas.height / 2, playerSize, this.playerColor);
     this.level = new Level(this.blockColor, blockSize, this.canvas.width, this.canvas.height);
+    this.gui = new GUI(this);
   }
 
   update() {
@@ -71,6 +73,7 @@ class Game {
     this.clearCanvas();
     this.player.draw(this.ctx);
     this.level.draw(this.ctx);
+    this.gui.draw();
   }
 
   clearCanvas() {
