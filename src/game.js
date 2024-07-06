@@ -68,7 +68,21 @@ class Game {
     this.level = new Level(this.blockColor, blockSize, this.canvas.width, this.canvas.height, this.gameState.currentSeed);
 
     this.gui = new GUI(this);
-    this.gui.updateGameStateDisplay(this.gameState.currentLevel); // Updated method name
+    this.gui.updateGameStateDisplay(this.gameState.currentLevel);
+  }
+
+  reinitializeGameObjects() {
+    const playerSize = Math.min(this.canvas.width * 0.1, this.canvas.height * 0.1);
+    const blockSize = Math.min(this.canvas.width * 0.15, this.canvas.height * 0.15);
+
+    // Reinitialize player
+    this.player = new Player(this.canvas.width / 2, this.canvas.height / 2, playerSize, this.playerColor);
+
+    // Reinitialize level
+    this.level = new Level(this.blockColor, blockSize, this.canvas.width, this.canvas.height, this.gameState.currentSeed);
+
+    // Update GUI
+    this.gui.updateGameStateDisplay(this.gameState.currentLevel);
   }
 
   update() {
@@ -133,7 +147,7 @@ class Game {
     this.level = new Level(this.blockColor, blockSize, this.canvas.width, this.canvas.height, this.gameState.currentSeed);
 
     // Update GUI to show new level number
-    this.gui.updateGameStateDisplay(this.gameState.currentLevel); // Updated method name
+    this.gui.updateGameStateDisplay(this.gameState.currentLevel);
 
     console.log(`Entered level ${this.gameState.currentLevel}`);
   }

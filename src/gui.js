@@ -179,6 +179,7 @@ export default class GUI {
         this.game.gameState.fromJSON(savedState);
         console.log("Game restored successfully");
         this.showMessage("Game restored successfully");
+        this.game.reinitializeGameObjects();
         this.updateGameMenuScreen();
         this.closeScreen();
       } catch (error) {
