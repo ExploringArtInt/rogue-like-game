@@ -4,7 +4,9 @@ import { Vector, MathUtils } from "./utilities.js";
 
 export default class Player extends Bulk {
   constructor(x, y, size, color) {
-    super(x, y, size, color, "./assets/svg/robots/robot-player.svg", true);
+    // Assuming a default mass for the player, adjust as needed
+    const mass = size * size * 0.8; // Making the player slightly lighter than blocks
+    super(x, y, size, color, "./assets/svg/robots/robot-player.svg", mass, true);
     this.acceleration = 0.1;
   }
 

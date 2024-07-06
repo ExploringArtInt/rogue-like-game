@@ -3,7 +3,7 @@ import { MathUtils, Vector, Collision } from "./utilities.js";
 import { loadSVG } from "./svg.js";
 
 export default class Bulk {
-  constructor(x, y, size, color, svgPath, isOriginCenter = false) {
+  constructor(x, y, size, color, svgPath, mass, isOriginCenter = false, isImmovable = false) {
     this.position = { x, y };
     this.prevPosition = { x, y };
     this.size = size;
@@ -12,9 +12,10 @@ export default class Bulk {
     this.acceleration = 0.1;
     this.maxSpeed = size * 0.4;
     this.friction = 0.85;
-    this.mass = size * size;
+    this.mass = mass;
     this.svgImage = null;
     this.isOriginCenter = isOriginCenter;
+    this.isImmovable = isImmovable;
     this.loadSVG(svgPath);
   }
 
@@ -88,6 +89,11 @@ export default class Bulk {
   }
 
   resolveCollision(other) {
+    if (this.isImmovable && other.isImmovable) {
+      // Both objects are immovable, do nothing
+      return;
+    }
+
     const bounciness = 0.1;
     const minImpulse = 0.1;
     const impulseScaler = 10000;
@@ -102,7 +108,7 @@ export default class Bulk {
     const velocityAlongNormal = Vector.dotProduct(relativeVelocity, collisionNormal);
 
     const impulseScalar = -(1 + bounciness) * velocityAlongNormal;
-    const totalMass = this.mass + other.mass;
+    const totalMass = this.isImmovable ? other.mass : other.isImmovable ? this.mass : this.mass + other.mass;
     const impulse = impulseScalar / totalMass;
 
     const impulseVector = Vector.multiply(collisionNormal, impulse);
@@ -112,11 +118,15 @@ export default class Bulk {
       y: Math.sign(impulseVector.y) * Math.max(Math.abs(impulseVector.y), minImpulse) * impulseScaler,
     };
 
-    this.velocity = Vector.add(this.velocity, Vector.multiply(appliedImpulse, 1 / this.mass));
-    other.velocity = Vector.subtract(other.velocity, Vector.multiply(appliedImpulse, 1 / other.mass));
+    if (!this.isImmovable) {
+      this.velocity = Vector.add(this.velocity, Vector.multiply(appliedImpulse, 1 / this.mass));
+      this.velocity = Vector.clamp(this.velocity, -this.maxSpeed, this.maxSpeed);
+    }
 
-    this.velocity = Vector.clamp(this.velocity, -this.maxSpeed, this.maxSpeed);
-    other.velocity = Vector.clamp(other.velocity, -other.maxSpeed, other.maxSpeed);
+    if (!other.isImmovable) {
+      other.velocity = Vector.subtract(other.velocity, Vector.multiply(appliedImpulse, 1 / other.mass));
+      other.velocity = Vector.clamp(other.velocity, -other.maxSpeed, other.maxSpeed);
+    }
 
     this.resolveOverlap(other);
   }
@@ -129,13 +139,13 @@ export default class Bulk {
     const overlapY = Math.min(thisRect.y + thisRect.height - otherRect.y, otherRect.y + otherRect.height - thisRect.y);
 
     if (overlapX < overlapY) {
-      const adjustment = overlapX / 2;
-      this.position.x += this.getCenter().x < other.getCenter().x ? -adjustment : adjustment;
-      other.position.x += this.getCenter().x < other.getCenter().x ? adjustment : -adjustment;
+      const adjustment = overlapX / (this.isImmovable || other.isImmovable ? 1 : 2);
+      if (!this.isImmovable) this.position.x += this.getCenter().x < other.getCenter().x ? -adjustment : adjustment;
+      if (!other.isImmovable) other.position.x += this.getCenter().x < other.getCenter().x ? adjustment : -adjustment;
     } else {
-      const adjustment = overlapY / 2;
-      this.position.y += this.getCenter().y < other.getCenter().y ? -adjustment : adjustment;
-      other.position.y += this.getCenter().y < other.getCenter().y ? adjustment : -adjustment;
+      const adjustment = overlapY / (this.isImmovable || other.isImmovable ? 1 : 2);
+      if (!this.isImmovable) this.position.y += this.getCenter().y < other.getCenter().y ? -adjustment : adjustment;
+      if (!other.isImmovable) other.position.y += this.getCenter().y < other.getCenter().y ? adjustment : -adjustment;
     }
   }
 

@@ -2,22 +2,27 @@
 import Bulk from "./bulk.js";
 
 export default class Block extends Bulk {
-  constructor(x, y, size, color, type = "normal") {
+  constructor(x, y, size, color, type = "normal", mass = size * size) {
     let svgPath;
+    let isImmovable = false;
+
     switch (type) {
       case "door":
         svgPath = "./assets/svg/doors/door-unlocked.svg";
+        isImmovable = true; // Make the door immovable
         break;
       default:
         svgPath = "./assets/svg/blocks/block-hex.svg";
     }
 
-    super(x, y, size, color, svgPath, false);
+    super(x, y, size, color, svgPath, mass, false, isImmovable);
     this.type = type;
   }
 
   update(canvasWidth, canvasHeight, player, blocks) {
-    super.update(canvasWidth, canvasHeight);
+    if (!this.isImmovable) {
+      super.update(canvasWidth, canvasHeight);
+    }
 
     if (this.checkCollision(player)) {
       this.resolveCollision(player);
@@ -30,11 +35,8 @@ export default class Block extends Bulk {
     }
   }
 
-  // You might want to add special behavior for the door here
-  // For example, a method to check if the player is trying to use the door
   checkDoorUse(player) {
     if (this.type === "door" && this.checkCollision(player)) {
-      // Implement door usage logic here
       console.log("Player is using the door!");
       return true;
     }

@@ -34,7 +34,7 @@ export default class Level {
     if (!this.doorPlaced) {
       const randomIndex = Math.floor(rng() * this.blocks.length);
       const randomBlock = this.blocks[randomIndex];
-      this.blocks[randomIndex] = new Block(randomBlock.position.x, randomBlock.position.y, this.blockSize - gapSize, this.blockColor, "door");
+      this.blocks[randomIndex] = this.createDoor(randomBlock.position.x, randomBlock.position.y, gapSize);
     }
   }
 
@@ -69,7 +69,7 @@ export default class Level {
       // 80% chance of creating a block
       if (!this.doorPlaced && rng() < 0.1) {
         // 10% chance of creating a door if not already placed
-        this.createDoor(x, y, gapSize);
+        this.blocks.push(this.createDoor(x, y, gapSize));
       } else {
         this.createBlock(x, y, gapSize);
       }
@@ -82,9 +82,11 @@ export default class Level {
   }
 
   createDoor(x, y, gapSize) {
-    const door = new Block(x, y, this.blockSize - gapSize, this.blockColor, "door");
-    this.blocks.push(door);
+    const doorSize = this.blockSize - gapSize;
+    const doorMass = doorSize * doorSize + 1000; // The mass doesn't affect movement now, but we'll keep it for consistency
+    const door = new Block(x, y, doorSize, this.blockColor, "door", doorMass);
     this.doorPlaced = true;
+    return door;
   }
 
   draw(ctx) {
