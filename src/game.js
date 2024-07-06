@@ -93,7 +93,17 @@ class Game {
   gameLoop() {
     this.update();
     this.draw();
-    requestAnimationFrame(() => this.gameLoop());
+
+    // Check for victory or defeat
+    if (this.gameState.isGameWon()) {
+      console.log("Congratulations! You've won the game!");
+      this.isPaused = true; // Pause the game
+    } else if (this.gameState.isGameLost()) {
+      console.log("Game Over! You've lost the game.");
+      this.isPaused = true; // Pause the game
+    } else {
+      requestAnimationFrame(() => this.gameLoop());
+    }
   }
 
   start() {

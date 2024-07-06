@@ -37,4 +37,12 @@ export default class GameState {
     this.playerEnergy = 100;
     this.playerHealth = 100;
   }
+
+  isGameWon() {
+    return this.currentLevel === 5;
+  }
+
+  isGameLost() {
+    return this.playerEnergy <= 0 || this.playerHealth <= 0;
+  }
 }
