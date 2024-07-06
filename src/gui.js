@@ -17,30 +17,17 @@ export default class GUI {
   createMenu() {
     const menuContainer = document.createElement("div");
     menuContainer.id = "menu-container";
-    menuContainer.style.position = "fixed";
-    menuContainer.style.bottom = "0";
-    menuContainer.style.left = "0";
-    menuContainer.style.width = "100%";
-    menuContainer.style.height = "80px";
-    menuContainer.style.display = "flex";
-    menuContainer.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+    menuContainer.classList.add("menu-container");
 
     this.menuOptions.forEach((option) => {
       const button = document.createElement("button");
       button.classList.add("menu-button");
       button.setAttribute("data-screen", option.screen);
       button.setAttribute("aria-label", option.label);
-      button.style.flex = "1";
-      button.style.border = "none";
-      button.style.cursor = "pointer";
-      button.style.outline = "none";
-      button.style.transition = "background-color 0.3s";
 
       const icon = document.createElement("img");
       icon.src = `./assets/svg/gui/${option.icon}`;
       icon.alt = option.label;
-      icon.style.width = "40px";
-      icon.style.height = "40px";
       icon.classList.add("menu-icon");
 
       button.appendChild(icon);
@@ -55,26 +42,15 @@ export default class GUI {
   createScreens() {
     this.menuOptions.forEach((option) => {
       const screen = document.createElement("div");
-      screen.classList.add("screen");
+      screen.classList.add("screen", "hidden"); // Add 'hidden' class by default
       screen.id = `${option.screen.toLowerCase()}-screen`;
-      screen.style.position = "fixed";
-      screen.style.top = "0";
-      screen.style.left = "0";
-      screen.style.width = "100%";
-      screen.style.height = "calc(100% - 80px)";
-      screen.style.backgroundColor = "rgba(0, 0, 0, 0.9)";
-      screen.style.color = "white";
-      screen.style.display = "none";
-      screen.style.flexDirection = "column";
-      screen.style.alignItems = "center";
-      screen.style.justifyContent = "center";
 
       const title = document.createElement("h2");
       title.textContent = `${option.screen} Screen`;
 
       const closeButton = document.createElement("button");
       closeButton.textContent = "Close";
-      closeButton.style.marginTop = "20px";
+      closeButton.classList.add("close-button");
       closeButton.addEventListener("click", () => this.closeScreen());
 
       screen.appendChild(title);
@@ -87,14 +63,14 @@ export default class GUI {
   openScreen(screenName) {
     this.activeScreen = screenName;
     this.game.setPaused(true);
-    document.getElementById("gameCanvas").style.display = "none";
-    document.getElementById(`${screenName.toLowerCase()}-screen`).style.display = "flex";
+    document.getElementById("gameCanvas").classList.add("hidden");
+    document.getElementById(`${screenName.toLowerCase()}-screen`).classList.remove("hidden");
   }
 
   closeScreen() {
     if (this.activeScreen) {
-      document.getElementById(`${this.activeScreen.toLowerCase()}-screen`).style.display = "none";
-      document.getElementById("gameCanvas").style.display = "block";
+      document.getElementById(`${this.activeScreen.toLowerCase()}-screen`).classList.add("hidden");
+      document.getElementById("gameCanvas").classList.remove("hidden");
       this.activeScreen = null;
       this.game.setPaused(false);
     }
