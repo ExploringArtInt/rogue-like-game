@@ -157,7 +157,32 @@ export default class GUI {
       document.body.appendChild(screen);
       this.modalButtons.push(closeButton);
     });
+    this.createMessageScreen();
     this.updateFocusableElements();
+  }
+
+  createMessageScreen() {
+    const screen = document.createElement("div");
+    screen.classList.add("modal-screen", "hidden");
+    screen.id = "message-screen";
+
+    const title = document.createElement("h2");
+    title.textContent = "Updated";
+
+    const content = document.createElement("div");
+    content.id = "message-content";
+
+    const closeButton = document.createElement("button");
+    closeButton.textContent = "Close";
+    closeButton.classList.add("modal-button");
+    closeButton.addEventListener("click", () => this.closeScreen());
+
+    screen.appendChild(title);
+    screen.appendChild(content);
+    screen.appendChild(closeButton);
+
+    document.body.appendChild(screen);
+    this.modalButtons.push(closeButton);
   }
 
   saveGame() {
@@ -178,10 +203,9 @@ export default class GUI {
       try {
         this.game.gameState.fromJSON(savedState);
         console.log("Game restored successfully");
-        this.showMessage("Game restored successfully");
         this.game.reinitializeGameObjects();
         this.updateGameMenuScreen();
-        this.closeScreen();
+        this.showMessage("Game restored successfully");
       } catch (error) {
         console.error("Failed to restore game:", error);
         this.showMessage("Failed to restore game");
@@ -198,13 +222,8 @@ export default class GUI {
   }
 
   showMessage(message) {
-    const messageElement = document.createElement("div");
-    messageElement.textContent = message;
-    messageElement.classList.add("message");
-    document.body.appendChild(messageElement);
-    setTimeout(() => {
-      messageElement.remove();
-    }, 3000);
+    this.closeScreen();
+    this.openScreen("message");
   }
 
   createActionButton(text, onClick) {
