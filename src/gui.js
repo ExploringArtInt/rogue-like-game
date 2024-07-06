@@ -6,7 +6,7 @@ export default class GUI {
       { icon: "gui-hamburger.svg", screen: "Game", label: "Open Game Menu" },
       { icon: "gui-battery-100.svg", screen: "Battery", label: "Open Battery Menu" },
       { icon: "gui-plain-circle.svg", screen: "Shield", label: "Open Shield Menu" },
-      { icon: "gui-auto-repair.svg", screen: "Repair", label: "Open Repair Menu" },
+      { icon: "gui-auto-repair.svg", screen: "Use", label: "Open Use Menu" },
     ];
     this.activeScreen = null;
     this.menuButtons = [];

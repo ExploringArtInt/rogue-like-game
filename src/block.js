@@ -17,6 +17,7 @@ export default class Block extends Bulk {
 
     super(x, y, size, color, svgPath, mass, false, isImmovable);
     this.type = type;
+    this.playerNearby = false;
   }
 
   update(canvasWidth, canvasHeight, player, blocks) {
@@ -31,6 +32,27 @@ export default class Block extends Bulk {
     for (const block of blocks) {
       if (block !== this && this.checkCollision(block)) {
         this.resolveCollision(block);
+      }
+    }
+
+    if (this.type === "door") {
+      this.checkPlayerProximity(player);
+    }
+  }
+
+  checkPlayerProximity(player) {
+    const proximityThreshold = this.size * 1.5; // Adjust this value as needed
+    const distance = Math.sqrt(Math.pow(this.position.x - player.position.x, 2) + Math.pow(this.position.y - player.position.y, 2));
+
+    if (distance <= proximityThreshold) {
+      if (!this.playerNearby) {
+        console.log("Player is near the door");
+        this.playerNearby = true;
+      }
+    } else {
+      if (this.playerNearby) {
+        console.log("Player has left the door's vicinity");
+        this.playerNearby = false;
       }
     }
   }
