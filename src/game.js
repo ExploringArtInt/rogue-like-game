@@ -68,7 +68,7 @@ class Game {
     this.level = new Level(this.blockColor, blockSize, this.canvas.width, this.canvas.height, this.gameState.currentSeed);
 
     this.gui = new GUI(this);
-    this.gui.updateLevelDisplay(this.gameState.currentLevel);
+    this.gui.updateGameStateDisplay(this.gameState.currentLevel); // Updated method name
   }
 
   update() {
@@ -123,7 +123,7 @@ class Game {
     this.level = new Level(this.blockColor, blockSize, this.canvas.width, this.canvas.height, this.gameState.currentSeed);
 
     // Update GUI to show new level number
-    this.gui.updateLevelDisplay(this.gameState.currentLevel);
+    this.gui.updateGameStateDisplay(this.gameState.currentLevel); // Updated method name
 
     console.log(`Entered level ${this.gameState.currentLevel}`);
   }

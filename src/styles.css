@@ -150,7 +150,7 @@ canvas {
     background-color: #222222;
 }
 
-.level-display {
+.game-state-display {
     position: fixed;
     top: 10px;
     left: 10px;

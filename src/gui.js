@@ -16,7 +16,7 @@ export default class GUI {
     this.createMenu();
     this.createScreens();
     this.setupKeyboardNavigation();
-    this.createLevelDisplay();
+    this.createGameStateDisplay();
   }
 
   createMenu() {
@@ -121,11 +121,11 @@ export default class GUI {
       const content = document.createElement("div");
       content.id = `${option.screen.toLowerCase().replace(/\s+/g, "-")}-content`;
 
-      // Add the current level text only for the Game Menu screen
+      // Add the game state text only for the Game Menu screen
       if (option.screen === "Game Menu") {
-        const levelText = document.createElement("p");
-        levelText.id = "game-menu-level-text";
-        content.appendChild(levelText);
+        const gameStateText = document.createElement("p");
+        gameStateText.id = "game-menu-game-state-text";
+        content.appendChild(gameStateText);
       }
 
       const closeButton = document.createElement("button");
@@ -169,9 +169,9 @@ export default class GUI {
   }
 
   updateGameMenuScreen() {
-    const levelText = document.getElementById("game-menu-level-text");
-    if (levelText) {
-      levelText.textContent = `Current Level: ${this.game.gameState.currentLevel}`;
+    const gameStateText = document.getElementById("game-menu-game-state-text");
+    if (gameStateText) {
+      gameStateText.textContent = `Current Level: ${this.game.gameState.currentLevel}`;
     }
   }
 
@@ -250,20 +250,20 @@ export default class GUI {
     }
   }
 
-  createLevelDisplay() {
-    const levelDisplay = document.createElement("div");
-    levelDisplay.id = "level-display";
-    levelDisplay.classList.add("level-display");
-    document.body.appendChild(levelDisplay);
-    this.updateLevelDisplay(this.game.gameState.currentLevel);
+  createGameStateDisplay() {
+    const gameStateDisplay = document.createElement("div");
+    gameStateDisplay.id = "game-state-display";
+    gameStateDisplay.classList.add("game-state-display");
+    document.body.appendChild(gameStateDisplay);
+    this.updateGameStateDisplay(this.game.gameState.currentLevel);
   }
 
-  updateLevelDisplay(levelNumber) {
-    const levelDisplay = document.getElementById("level-display");
-    if (levelDisplay) {
-      levelDisplay.textContent = `Level: ${levelNumber}`;
+  updateGameStateDisplay(levelNumber) {
+    const gameStateDisplay = document.getElementById("game-state-display");
+    if (gameStateDisplay) {
+      gameStateDisplay.textContent = `Level: ${levelNumber}`;
     } else {
-      console.warn("Level display element not found");
+      console.warn("Game state display element not found");
     }
   }
 }
