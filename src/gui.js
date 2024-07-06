@@ -201,7 +201,6 @@ export default class GUI {
       try {
         this.game.gameState.fromJSON(savedState);
         this.game.reinitializeGameObjects();
-        this.updateGameMenuScreen();
         this.showMessage("Game restored successfully");
       } catch (error) {
         console.error("Failed to restore game:", error);
