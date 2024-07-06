@@ -121,6 +121,13 @@ export default class GUI {
       const content = document.createElement("div");
       content.id = `${option.screen.toLowerCase().replace(/\s+/g, "-")}-content`;
 
+      // Add the current level text only for the Game Menu screen
+      if (option.screen === "Game Menu") {
+        const levelText = document.createElement("p");
+        levelText.id = "game-menu-level-text";
+        content.appendChild(levelText);
+      }
+
       const closeButton = document.createElement("button");
       closeButton.textContent = "Close";
       closeButton.classList.add("modal-button");
@@ -150,12 +157,21 @@ export default class GUI {
     const screen = document.getElementById(`${screenName.toLowerCase().replace(/\s+/g, "-")}-screen`);
     if (screen) {
       screen.classList.remove("hidden");
-      if (screenName === "Use Something") {
+      if (screenName === "Game Menu") {
+        this.updateGameMenuScreen();
+      } else if (screenName === "Use Something") {
         this.updateUseSomethingScreen();
       }
       this.updateFocusableElements();
     } else {
       console.error(`Screen not found: ${screenName}`);
+    }
+  }
+
+  updateGameMenuScreen() {
+    const levelText = document.getElementById("game-menu-level-text");
+    if (levelText) {
+      levelText.textContent = `Current Level: ${this.game.gameState.currentLevel}`;
     }
   }
 
@@ -239,7 +255,7 @@ export default class GUI {
     levelDisplay.id = "level-display";
     levelDisplay.classList.add("level-display");
     document.body.appendChild(levelDisplay);
-    this.updateLevelDisplay(this.game.currentLevelNumber);
+    this.updateLevelDisplay(this.game.gameState.currentLevel);
   }
 
   updateLevelDisplay(levelNumber) {
