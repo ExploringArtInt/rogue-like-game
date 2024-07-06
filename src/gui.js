@@ -9,9 +9,11 @@ export default class GUI {
       { icon: "gui-auto-repair.svg", screen: "Repair", label: "Open Repair Menu" },
     ];
     this.activeScreen = null;
+    this.menuButtons = [];
 
     this.createMenu();
     this.createScreens();
+    this.setupKeyboardNavigation();
   }
 
   createMenu() {
@@ -19,11 +21,12 @@ export default class GUI {
     menuContainer.id = "menu-container";
     menuContainer.classList.add("menu-container");
 
-    this.menuOptions.forEach((option) => {
+    this.menuOptions.forEach((option, index) => {
       const button = document.createElement("button");
       button.classList.add("menu-button");
       button.setAttribute("data-screen", option.screen);
       button.setAttribute("aria-label", option.label);
+      button.tabIndex = 0;
 
       const icon = document.createElement("img");
       icon.src = `./assets/svg/gui/${option.icon}`;
@@ -34,6 +37,7 @@ export default class GUI {
       menuContainer.appendChild(button);
 
       button.addEventListener("click", () => this.toggleScreen(option.screen));
+      this.menuButtons.push(button);
     });
 
     document.body.appendChild(menuContainer);
@@ -60,12 +64,59 @@ export default class GUI {
     });
   }
 
+  setupKeyboardNavigation() {
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Tab") {
+        event.preventDefault();
+        this.handleTabNavigation(event.shiftKey);
+      } else if (event.key === " ") {
+        event.preventDefault(); // Prevent default Enter key behavior
+        this.handleSpaceKey();
+      }
+    });
+
+    this.menuButtons.forEach((button) => {
+      button.addEventListener("focus", () => {
+        button.classList.add("menu-button-focused");
+      });
+
+      button.addEventListener("blur", () => {
+        button.classList.remove("menu-button-focused");
+      });
+
+      // Add keydown event listener to each button
+      button.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault(); // Prevent default Enter key behavior
+          this.toggleScreen(button.getAttribute("data-screen"));
+        }
+      });
+    });
+  }
+
+  handleTabNavigation(isShiftKey) {
+    const focusedElement = document.activeElement;
+    const currentIndex = this.menuButtons.indexOf(focusedElement);
+
+    let nextIndex;
+    if (isShiftKey) {
+      nextIndex = currentIndex > 0 ? currentIndex - 1 : this.menuButtons.length - 1;
+    } else {
+      nextIndex = currentIndex < this.menuButtons.length - 1 ? currentIndex + 1 : 0;
+    }
+
+    this.menuButtons[nextIndex].focus();
+  }
+
+  handleSpaceKey() {
+    console.debug("In handleSpaceKey");
+  }
+
   toggleScreen(screenName) {
+    console.debug("In toggleScreen");
     if (this.activeScreen === screenName) {
-      // If clicking on the currently open screen, close it
       this.closeScreen();
     } else {
-      // If a different screen is requested, close the current one (if any) and open the new one
       if (this.activeScreen) {
         this.closeScreen();
       }
