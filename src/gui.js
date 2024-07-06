@@ -10,6 +10,8 @@ export default class GUI {
     ];
     this.activeScreen = null;
     this.menuButtons = [];
+    this.modalButtons = [];
+    this.allFocusableElements = [];
 
     this.createMenu();
     this.createScreens();
@@ -42,6 +44,7 @@ export default class GUI {
     });
 
     document.body.appendChild(menuContainer);
+    this.updateFocusableElements();
   }
 
   setupKeyboardNavigation() {
@@ -49,49 +52,44 @@ export default class GUI {
       if (event.key === "Tab") {
         event.preventDefault();
         this.handleTabNavigation(event.shiftKey);
-      } else if (event.key === " ") {
-        event.preventDefault();
-        this.handleSpaceKey();
       } else if (event.key === "Escape") {
         event.preventDefault();
         this.handleEscapeKey();
       }
     });
 
-    this.menuButtons.forEach((button) => {
-      button.addEventListener("focus", () => {
-        button.classList.add("menu-button-focused");
+    this.allFocusableElements.forEach((element) => {
+      element.addEventListener("focus", () => {
+        element.classList.add("focused");
       });
 
-      button.addEventListener("blur", () => {
-        button.classList.remove("menu-button-focused");
+      element.addEventListener("blur", () => {
+        element.classList.remove("focused");
       });
 
-      button.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          this.toggleScreen(button.getAttribute("data-screen"));
-        }
-      });
+      if (element.classList.contains("menu-button")) {
+        element.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            this.toggleScreen(element.getAttribute("data-screen"));
+          }
+        });
+      }
     });
   }
 
   handleTabNavigation(isShiftKey) {
     const focusedElement = document.activeElement;
-    const currentIndex = this.menuButtons.indexOf(focusedElement);
+    const currentIndex = this.allFocusableElements.indexOf(focusedElement);
 
     let nextIndex;
     if (isShiftKey) {
-      nextIndex = currentIndex > 0 ? currentIndex - 1 : this.menuButtons.length - 1;
+      nextIndex = currentIndex > 0 ? currentIndex - 1 : this.allFocusableElements.length - 1;
     } else {
-      nextIndex = currentIndex < this.menuButtons.length - 1 ? currentIndex + 1 : 0;
+      nextIndex = currentIndex < this.allFocusableElements.length - 1 ? currentIndex + 1 : 0;
     }
 
-    this.menuButtons[nextIndex].focus();
-  }
-
-  handleSpaceKey() {
-    console.debug("In handleSpaceKey");
+    this.allFocusableElements[nextIndex].focus();
   }
 
   handleEscapeKey() {
@@ -133,7 +131,9 @@ export default class GUI {
       screen.appendChild(closeButton);
 
       document.body.appendChild(screen);
+      this.modalButtons.push(closeButton);
     });
+    this.updateFocusableElements();
   }
 
   openScreen(screenName) {
@@ -153,6 +153,7 @@ export default class GUI {
       if (screenName === "Use Something") {
         this.updateUseSomethingScreen();
       }
+      this.updateFocusableElements();
     } else {
       console.error(`Screen not found: ${screenName}`);
     }
@@ -177,6 +178,8 @@ export default class GUI {
         this.closeScreen();
       });
       content.appendChild(enterDoorButton);
+      this.modalButtons.push(enterDoorButton);
+      this.updateFocusableElements();
     } else {
       content.textContent = "No actions available.";
     }
@@ -200,6 +203,18 @@ export default class GUI {
 
       this.activeScreen = null;
       this.game.setPaused(false);
+      this.updateFocusableElements();
+    }
+  }
+
+  updateFocusableElements() {
+    this.allFocusableElements = [...this.menuButtons];
+    if (this.activeScreen) {
+      const activeScreenElement = document.getElementById(`${this.activeScreen.toLowerCase().replace(/\s+/g, "-")}-screen`);
+      if (activeScreenElement) {
+        const modalButtons = activeScreenElement.querySelectorAll(".modal-button");
+        this.allFocusableElements = [...this.allFocusableElements, ...modalButtons];
+      }
     }
   }
 
