@@ -105,6 +105,18 @@ canvas {
 .close-button {
     margin-top: 20px;
     font-family: "Comfortaa Medium", sans-serif;
+    padding: 10px 20px; /* Added padding */
+    cursor: pointer; /* Added for better UX */
+    background-color: #333; /* Added for visibility */
+    color: white; /* Added for contrast */
+    border: none; /* Added for clean look */
+    border-radius: 5px; /* Added for rounded corners */
+    transition: background-color 0.3s ease; /* Added for smooth hover effect */
+}
+
+.close-button:hover,
+.close-button:focus {
+    background-color: #555; /* Added for hover/focus effect */
 }
 
 .hidden {

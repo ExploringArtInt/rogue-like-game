@@ -70,8 +70,11 @@ export default class GUI {
         event.preventDefault();
         this.handleTabNavigation(event.shiftKey);
       } else if (event.key === " ") {
-        event.preventDefault(); // Prevent default Enter key behavior
+        event.preventDefault();
         this.handleSpaceKey();
+      } else if (event.key === "Escape") {
+        event.preventDefault();
+        this.handleEscapeKey();
       }
     });
 
@@ -110,6 +113,12 @@ export default class GUI {
 
   handleSpaceKey() {
     console.debug("In handleSpaceKey");
+  }
+
+  handleEscapeKey() {
+    if (this.activeScreen) {
+      this.closeScreen();
+    }
   }
 
   toggleScreen(screenName) {
