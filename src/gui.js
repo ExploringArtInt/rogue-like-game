@@ -42,6 +42,7 @@ export default class GUI {
       icon.alt = option.label;
       icon.style.width = "40px";
       icon.style.height = "40px";
+      icon.classList.add("menu-icon");
 
       button.appendChild(icon);
       menuContainer.appendChild(button);
