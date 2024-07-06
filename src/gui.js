@@ -125,7 +125,7 @@ export default class GUI {
 
       const closeButton = document.createElement("button");
       closeButton.textContent = "Close";
-      closeButton.classList.add("close-button");
+      closeButton.classList.add("modal-button");
       closeButton.addEventListener("click", () => this.closeScreen());
 
       screen.appendChild(title);
@@ -171,7 +171,7 @@ export default class GUI {
     if (this.game.level.isPlayerNearDoor()) {
       const enterDoorButton = document.createElement("button");
       enterDoorButton.textContent = "Enter Door";
-      enterDoorButton.classList.add("action-button");
+      enterDoorButton.classList.add("modal-button");
       enterDoorButton.addEventListener("click", () => {
         this.game.goToNextLevel();
         this.closeScreen();

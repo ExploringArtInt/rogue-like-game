@@ -109,7 +109,7 @@ canvas {
     z-index: 3;
 }
 
-.close-button {
+.modal-button {
     margin-top: 20px;
     font-family: "Comfortaa Medium", sans-serif;
     font-size: 1.5em;
@@ -122,8 +122,8 @@ canvas {
     transition: background-color 0.3s ease;
 }
 
-.close-button:hover,
-.close-button:focus {
+.modal-button:hover,
+.modal-button:focus {
     background-color: #555;
 }
 
