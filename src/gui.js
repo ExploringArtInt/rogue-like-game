@@ -129,20 +129,20 @@ export default class GUI {
         gameStateText.id = "game-menu-game-state-text";
         content.appendChild(gameStateText);
 
-        // Add new buttons for save, restore, and delete game
+        // Add new buttons for save, restore, and delete all
         const saveGameButton = this.createActionButton("Save Game", () => {
           this.saveGame();
         });
         const restoreGameButton = this.createActionButton("Restore Game", () => {
           console.log("Restore Game button clicked");
         });
-        const deleteGameButton = this.createActionButton("Delete Saved Game", () => {
-          console.log("Delete Saved Game button clicked");
+        const deleteAllButton = this.createActionButton("Delete All", () => {
+          this.deleteAll();
         });
 
         content.appendChild(saveGameButton);
         content.appendChild(restoreGameButton);
-        content.appendChild(deleteGameButton);
+        content.appendChild(deleteAllButton);
       }
 
       const closeButton = document.createElement("button");
@@ -170,6 +170,12 @@ export default class GUI {
       console.error("Failed to save game:", error);
       this.showMessage("Failed to save game");
     }
+  }
+
+  deleteAll() {
+    Cookie.toss("gameState");
+    console.log("All saved data deleted");
+    this.showMessage("All saved data deleted");
   }
 
   showMessage(message) {
