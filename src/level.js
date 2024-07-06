@@ -1,5 +1,4 @@
 // level.js
-import { MathUtils } from "./utilities.js";
 import Block from "./block.js";
 
 export default class Level {

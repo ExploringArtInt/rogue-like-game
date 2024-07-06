@@ -157,4 +157,17 @@ export default class Bulk {
           y: this.position.y + this.size / 2,
         };
   }
+
+  calculateDistance(other) {
+    // Calculate the center points of this and the other object
+    const thisCenterX = this.position.x + (this.isOriginCenter ? 0 : this.size / 2);
+    const thisCenterY = this.position.y + (this.isOriginCenter ? 0 : this.size / 2);
+    const otherCenterX = other.position.x + (other.isOriginCenter ? 0 : other.size / 2);
+    const otherCenterY = other.position.y + (other.isOriginCenter ? 0 : other.size / 2);
+
+    // Calculate the distance between the centers
+    const dx = thisCenterX - otherCenterX;
+    const dy = thisCenterY - otherCenterY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
 }
