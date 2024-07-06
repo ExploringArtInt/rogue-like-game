@@ -72,7 +72,7 @@ class Game {
   update() {
     if (!this.isPaused) {
       this.player.update(this.keys, this.canvas.width, this.canvas.height, this.level);
-      this.level.update(this.player);
+      this.level.update(this.player, this.gui);
       this.player.lateUpdate(this.keys, this.canvas.width, this.canvas.height, this.level);
     }
   }

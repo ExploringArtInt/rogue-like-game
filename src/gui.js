@@ -148,4 +148,20 @@ export default class GUI {
       this.game.setPaused(false);
     }
   }
+
+  setFocusedElement(optionName) {
+    const button = this.menuButtons.find((btn) => btn.getAttribute("data-screen") === optionName);
+    if (button) {
+      button.focus();
+    } else {
+      console.warn(`Menu option '${optionName}' not found.`);
+    }
+  }
+
+  clearFocusedElement() {
+    const focusedButton = this.menuButtons.find((btn) => btn === document.activeElement);
+    if (focusedButton) {
+      focusedButton.blur();
+    }
+  }
 }

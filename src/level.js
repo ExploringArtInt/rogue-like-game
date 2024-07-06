@@ -12,6 +12,7 @@ export default class Level {
     this.seed = seed;
     this.doorPlaced = false;
     this.generateBlocks(this.seed);
+    this.playerNearDoor = false;
   }
 
   generateBlocks(seed) {
@@ -93,13 +94,31 @@ export default class Level {
     this.blocks.forEach((block) => block.draw(ctx));
   }
 
-  update(player) {
+  update(player, gui) {
+    let playerNearDoor = false;
     this.blocks.forEach((block) => {
       block.update(this.width, this.height, player, this.blocks);
       if (block.type === "door") {
-        block.checkDoorUse(player);
+        if (this.checkPlayerProximity(player, block)) {
+          playerNearDoor = true;
+        }
       }
     });
+
+    if (playerNearDoor !== this.playerNearDoor) {
+      this.playerNearDoor = playerNearDoor;
+      if (playerNearDoor) {
+        gui.setFocusedElement("Use");
+      } else {
+        gui.clearFocusedElement();
+      }
+    }
+  }
+
+  checkPlayerProximity(player, door) {
+    const proximityThreshold = this.blockSize * 0.8; // Adjust this value as needed
+    const distance = Math.sqrt(Math.pow(door.position.x - player.position.x, 2) + Math.pow(door.position.y - player.position.y, 2));
+    return distance <= proximityThreshold;
   }
 
   // Method to regenerate the level with a new seed
