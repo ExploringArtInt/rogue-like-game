@@ -32,7 +32,6 @@ export default class GUI {
       button.setAttribute("aria-label", option.label);
       button.style.flex = "1";
       button.style.border = "none";
-      button.style.background = "transparent";
       button.style.cursor = "pointer";
       button.style.outline = "none";
       button.style.transition = "background-color 0.3s";
