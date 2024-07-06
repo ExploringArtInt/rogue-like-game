@@ -178,4 +178,33 @@ const Debug = {
   },
 };
 
-export { MathUtils, Vector, Collision, Time, DataStructure, Easing, Color, Geometry, Helpers, Assets, Debug };
+// Cookie Operations
+const Cookie = {
+  saveToCookie: (name, value, days = 7) => {
+    const expirationDate = new Date();
+    expirationDate.setDate(expirationDate.getDate() + days);
+    const cookieValue = encodeURIComponent(value) + (days === null ? "" : `; expires=${expirationDate.toUTCString()}`);
+    document.cookie = `${name}=${cookieValue}; path=/`;
+  },
+
+  getFromCookie: (name) => {
+    const nameEQ = `${name}=`;
+    const cookieArray = document.cookie.split(";");
+    for (let i = 0; i < cookieArray.length; i++) {
+      let cookie = cookieArray[i];
+      while (cookie.charAt(0) === " ") {
+        cookie = cookie.substring(1, cookie.length);
+      }
+      if (cookie.indexOf(nameEQ) === 0) {
+        return decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
+      }
+    }
+    return null;
+  },
+
+  clearCookie: (name) => {
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+  },
+};
+
+export { MathUtils, Vector, Collision, Time, DataStructure, Easing, Color, Geometry, Helpers, Assets, Debug, Cookie };

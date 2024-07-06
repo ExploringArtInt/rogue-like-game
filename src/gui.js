@@ -126,6 +126,21 @@ export default class GUI {
         const gameStateText = document.createElement("p");
         gameStateText.id = "game-menu-game-state-text";
         content.appendChild(gameStateText);
+
+        // Add new buttons for save, restore, and delete game
+        const saveGameButton = this.createActionButton("Save Game", () => {
+          console.log("Save Game button clicked");
+        });
+        const restoreGameButton = this.createActionButton("Restore Game", () => {
+          console.log("Restore Game button clicked");
+        });
+        const deleteGameButton = this.createActionButton("Delete Saved Game", () => {
+          console.log("Delete Saved Game button clicked");
+        });
+
+        content.appendChild(saveGameButton);
+        content.appendChild(restoreGameButton);
+        content.appendChild(deleteGameButton);
       }
 
       const closeButton = document.createElement("button");
@@ -141,6 +156,15 @@ export default class GUI {
       this.modalButtons.push(closeButton);
     });
     this.updateFocusableElements();
+  }
+
+  createActionButton(text, onClick) {
+    const button = document.createElement("button");
+    button.textContent = text;
+    button.classList.add("action-button");
+    button.addEventListener("click", onClick);
+    this.modalButtons.push(button);
+    return button;
   }
 
   openScreen(screenName) {
@@ -235,7 +259,7 @@ export default class GUI {
     if (this.activeScreen) {
       const activeScreenElement = document.getElementById(`${this.activeScreen.toLowerCase().replace(/\s+/g, "-")}-screen`);
       if (activeScreenElement) {
-        const modalButtons = activeScreenElement.querySelectorAll(".modal-button");
+        const modalButtons = activeScreenElement.querySelectorAll(".modal-button, .action-button");
         this.allFocusableElements = [...this.allFocusableElements, ...modalButtons];
       }
     }

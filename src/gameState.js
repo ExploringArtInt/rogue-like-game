@@ -45,4 +45,29 @@ export default class GameState {
   isGameLost() {
     return this.playerEnergy <= 0 || this.playerHealth <= 0;
   }
+
+  toJSON() {
+    return JSON.stringify({
+      currentLevel: this.currentLevel,
+      currentSeed: this.currentSeed,
+      playerEnergy: this.playerEnergy,
+      playerHealth: this.playerHealth,
+      gamesCompleted: this.gamesCompleted,
+    });
+  }
+
+  fromJSON(jsonString) {
+    try {
+      const parsedState = JSON.parse(jsonString);
+      this.currentLevel = parsedState.currentLevel || 1;
+      this.currentSeed = parsedState.currentSeed || Date.now();
+      this.playerEnergy = parsedState.playerEnergy || 100;
+      this.playerHealth = parsedState.playerHealth || 100;
+      this.gamesCompleted = parsedState.gamesCompleted || 0;
+    } catch (error) {
+      console.error("Error parsing game state JSON:", error);
+      // If there's an error parsing, we'll reset to default values
+      this.reset();
+    }
+  }
 }
