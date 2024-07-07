@@ -223,7 +223,13 @@ const Cookie = {
     for (let i = 0; i < cookieArray.length; i++) {
       let cookie = cookieArray[i].trim();
       if (cookie.indexOf(nameEQ) === 0) {
-        return JSON.parse(decodeURIComponent(cookie.substring(nameEQ.length, cookie.length)));
+        const rawValue = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
+        try {
+          return JSON.parse(rawValue);
+        } catch (e) {
+          // If parsing fails, return the raw string
+          return rawValue;
+        }
       }
     }
     return null;
