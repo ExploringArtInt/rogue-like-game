@@ -110,20 +110,24 @@ class Game {
 
     // Check for victory or defeat
     if (this.gameState.isGameWon()) {
-      this.gameState.reset;
-      this.reinitializeGameObjects();
       this.gui.showMessage("Congratulations! You've won the game!");
+      this.restartGame();
     } else if (this.gameState.isGameLost()) {
-      this.gameState.reset;
-      this.reinitializeGameObjects();
       this.gui.showMessage("Game Over! You've lost the game.");
+      this.restartGame();
     } else {
-      requestAnimationFrame(() => this.gameLoop());
+      requestAnimationFrame(() => this.gameLoop()); // this is the loop
     }
   }
 
   start() {
     this.gameLoop();
+  }
+
+  restartGame() {
+    this.gameState.reset();
+    this.reinitializeGameObjects();
+    this.gameLoop(); // Restart the game loop
   }
 
   setPaused(isPaused) {
