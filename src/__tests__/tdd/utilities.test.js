@@ -1,5 +1,5 @@
 // src/__tests__/utilities.test.js
-import { MathUtils, Vector, Collision, Time, DataStructure, Easing, Color, Geometry, Helpers, Assets, Debug, Cookie } from "../utilities.js";
+import { MathUtils, Vector, Collision, Time, DataStructure, Easing, Color, Geometry, Helpers, Assets, Debug, Cookie } from "../../utilities.js";
 
 describe("Utilities", () => {
   describe("MathUtils", () => {
