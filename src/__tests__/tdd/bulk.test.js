@@ -82,10 +82,8 @@ describe("Bulk", () => {
     const bulkMoved = bulk.position.x !== initialBulkPosition.x || bulk.position.y !== initialBulkPosition.y;
     const otherMoved = other.position.x !== initialOtherPosition.x || other.position.y !== initialOtherPosition.y;
 
-    // Check if at least one of the objects moved
     expect(bulkMoved || otherMoved).toBe(true);
 
-    // Check if the distance between the objects has increased
     const initialDistance = Math.hypot(initialBulkPosition.x - initialOtherPosition.x, initialBulkPosition.y - initialOtherPosition.y);
     const finalDistance = Math.hypot(bulk.position.x - other.position.x, bulk.position.y - other.position.y);
     expect(finalDistance).toBeGreaterThan(initialDistance);
@@ -107,5 +105,39 @@ describe("Bulk", () => {
       drawImage: jest.fn(),
     };
     expect(() => bulk.draw(mockContext)).not.toThrow();
+  });
+
+  // Updated test case for immovable bulk
+  test("update method does not change position for immovable bulk", () => {
+    const immovableBulk = new Bulk(100, 100, 50, "#000000", "./test.svg", 2500, false, true);
+    const initialPosition = { ...immovableBulk.position };
+    immovableBulk.velocity = { x: 5, y: 5 };
+    immovableBulk.update(1000, 1000);
+    expect(immovableBulk.position).toEqual(initialPosition);
+  });
+
+  test("resolveCollision does not change velocity for immovable bulk", () => {
+    const immovableBulk = new Bulk(100, 100, 50, "#000000", "./test.svg", 2500, false, true);
+    const other = new Bulk(125, 125, 50, "#FFFFFF", "./test.svg", 2500, false, false);
+    immovableBulk.velocity = { x: 0, y: 0 };
+    other.velocity = { x: -5, y: 0 };
+    immovableBulk.resolveCollision(other);
+    expect(immovableBulk.velocity).toEqual({ x: 0, y: 0 });
+    expect(other.velocity.x).toBeGreaterThan(-5);
+  });
+
+  test("getRect returns correct rectangle for origin-centered bulk", () => {
+    const centeredBulk = new Bulk(100, 100, 50, "#000000", "./test.svg", 2500, true, false);
+    const rect = centeredBulk.getRect();
+    expect(rect).toEqual({
+      x: 75,
+      y: 75,
+      width: 50,
+      height: 50,
+    });
+  });
+
+  test("loadSVG is called with correct parameters", () => {
+    expect(jest.requireMock("../../svg.js").loadSVG).toHaveBeenCalledWith("./test.svg", "#000000");
   });
 });

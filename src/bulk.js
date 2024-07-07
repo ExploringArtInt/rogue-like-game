@@ -57,9 +57,11 @@ export default class Bulk {
   }
 
   update(canvasWidth, canvasHeight) {
-    this.updatePosition();
-    this.applyFriction();
-    this.constrainPosition(canvasWidth, canvasHeight);
+    if (!this.isImmovable) {
+      this.updatePosition();
+      this.applyFriction();
+      this.constrainPosition(canvasWidth, canvasHeight);
+    }
   }
 
   updatePosition() {
