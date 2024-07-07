@@ -2,7 +2,11 @@
 
 // MathUtils Functions
 const MathUtils = {
-  bezierBlend: (t) => t * t * (3.0 - 2.0 * t),
+  bezierBlend: (t) => {
+    if (t <= 0) return 0;
+    if (t >= 1) return 1;
+    return t * t * (3.0 - 2.0 * t);
+  },
 
   lerp: (start, end, t) => start * (1 - t) + end * t,
 

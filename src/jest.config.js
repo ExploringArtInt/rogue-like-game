@@ -4,6 +4,6 @@ module.exports = {
     "^.+\\.js$": ["babel-jest", { rootMode: "upward" }],
   },
   moduleFileExtensions: ["js", "feature"],
-  testMatch: ["**/*.steps.js"],
+  testMatch: ["**/*.steps.js", "**/*.test.js"],
   transformIgnorePatterns: ["/node_modules/(?!(jest-cucumber)/)"],
 };
