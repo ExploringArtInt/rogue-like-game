@@ -1,7 +1,7 @@
 # __tests__/player.feature
 Feature: Player
-  As a game developer
-  I want to ensure the Player class works correctly
+  As a player
+  I want to ensure my Player works correctly
   So that the game behaves as expected
 
   Scenario: Player initialization
