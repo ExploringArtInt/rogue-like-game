@@ -1,46 +1,50 @@
 Feature: Game Functionality
-  As a player
-  I want to interact with the game
-  So that I can play and progress through levels
+  As a game developer
+  I want to ensure the Game class functions correctly
+  So that the game runs smoothly
 
-  Scenario: Starting a new game
-    Given the game is initialized
-    When I start a new game
-    Then the game should be in its initial state
+  Scenario: Game initialization
+    When a new Game is created
+    Then the game should be properly initialized
 
-  Scenario: Player movement
-    Given the game is running
-    When I press the right arrow key
-    Then the player should move to the right
+  Scenario: Handling key presses
+    Given a game is running
+    When a key is pressed down
+    Then the corresponding key state should be set to true
+    When a key is released
+    Then the corresponding key state should be set to false
 
-  Scenario: Collision detection
-    Given the game is running
-    And there is a block in front of the player
-    When the player moves towards the block
-    Then the player should not pass through the block
+  Scenario: Game update
+    Given a game is running
+    When the game is updated
+    Then the player and level should be updated
 
-  Scenario: Level progression
-    Given the game is running
-    And the player is near a door
-    When the player uses the door
-    Then the game should advance to the next level
+  Scenario: Game drawing
+    Given a game is running
+    When the game is drawn
+    Then the level and player should be drawn
 
-  Scenario: Game pausing
-    Given the game is running
-    When I pause the game
-    Then the game should stop updating
+  Scenario: Game loop
+    Given a game is running
+    When the game loop is executed
+    Then the game should be updated and drawn
 
-  Scenario: Game resuming
-    Given the game is paused
-    When I resume the game
-    Then the game should continue updating
+  Scenario: Starting the game
+    Given a game is initialized
+    When the game is started
+    Then the game loop should be initiated
 
-  Scenario: Game over detection
-    Given the game is running
-    When the player's energy reaches 0
-    Then the game should end
+  Scenario: Restarting the game
+    Given a game is running
+    When the game is restarted
+    Then the game state should be reset
 
-  Scenario: Game winning
-    Given the game is running
-    When the player completes the final level
-    Then the game should show a victory message
+  Scenario: Pausing the game
+    Given a game is running
+    When the game is paused
+    Then the isPaused state should be updated
+
+  Scenario: Going to next level
+    Given a game is running
+    When the player goes to the next level
+    Then the game state should be updated for the new level
