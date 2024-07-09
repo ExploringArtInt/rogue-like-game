@@ -6,13 +6,14 @@ import GameState from "./gameState.js";
 
 class Game {
   constructor() {
+    this.gameState = new GameState(); // Initialize the game state
+
     this.canvas = document.getElementById("gameCanvas");
     this.ctx = this.canvas.getContext("2d");
+    // blows up here       ^
     this.backgroundColor = "#222222";
     this.playerColor = "#DDDDDD";
     this.blockColor = "#000000";
-
-    this.gameState = new GameState(); // Initialize the game state
 
     this.setupCanvas();
     this.setupEventListeners();

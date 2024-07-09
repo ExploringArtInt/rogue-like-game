@@ -5,6 +5,7 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
 
 // TypeError: Cannot read properties of null (reading 'getContext')
+// TBD: REFACTOR USING APPROACH USED IN game.test.js
 // import Game from "../../game.js";
 
 const feature = loadFeature("./src/__tests__/bdd/game.feature");
