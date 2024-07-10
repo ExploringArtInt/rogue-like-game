@@ -4,7 +4,7 @@
 
 import { defineFeature, loadFeature } from "jest-cucumber";
 
-const feature = loadFeature("./src/__tests__/bdd/gui.feature");
+const feature = loadFeature("./src/__tests__/bdd/gui.feature.txt");
 
 import GUI from "../../gui.js";
 import { Cookie } from "../../utilities.js";

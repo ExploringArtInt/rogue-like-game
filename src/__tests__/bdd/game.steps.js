@@ -5,7 +5,7 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
 import "jest-canvas-mock";
 
-const feature = loadFeature("./src/__tests__/bdd/game.feature");
+const feature = loadFeature("./src/__tests__/bdd/game.feature.txt");
 
 // Mock the entire Game module
 jest.mock("../../game.js", () => {

@@ -1,5 +1,5 @@
 # __tests__/player.feature
-Feature: Player
+Feature: Player Abilities
   As a player
   I want to ensure my Player works correctly
   So that the game behaves as expected

@@ -1,0 +1,18 @@
+# excellence.feature.txt
+
+Feature: Excellence
+
+Scenario: architecture must be excellent
+    Given solution aligns with excellent architecture
+    When building solution
+    Then architecture is excellent
+
+Scenario: nfrs must be met
+    Given solution meets non functional requirements
+    When building solution
+    Then nfrs are met
+
+Scenario: tech debt must be low
+    Given solution doesn't smell bad
+    When building solution
+    Then tech debt is low

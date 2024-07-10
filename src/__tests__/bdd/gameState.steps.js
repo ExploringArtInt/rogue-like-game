@@ -1,7 +1,7 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
 import GameState from "../../gameState.js";
 
-const feature = loadFeature("./src/__tests__/bdd/gameState.feature");
+const feature = loadFeature("./src/__tests__/bdd/gameState.feature.txt");
 
 defineFeature(feature, (test) => {
   let gameState;
