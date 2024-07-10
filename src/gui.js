@@ -203,7 +203,7 @@ export default class GUI {
         this.game.reinitializeGameObjects();
         this.showMessage("Game restored successfully");
       } catch (error) {
-        console.error("Failed to restore game:", error);
+        console.debug("Failed to restore game:", error);
         this.showMessage("Failed to restore game");
       }
     } else {
@@ -217,7 +217,7 @@ export default class GUI {
   }
 
   showMessage(message) {
-    console.log(message);
+    // console.log(message);
     this.closeScreen();
     const messageContent = document.getElementById("message-content");
     if (messageContent) {
@@ -243,7 +243,7 @@ export default class GUI {
     if (gameCanvas) {
       gameCanvas.classList.add("hidden");
     } else {
-      console.warn("Game canvas element not found");
+      console.debug("Game canvas element not found");
     }
 
     const screen = document.getElementById(`${screenName.toLowerCase().replace(/\s+/g, "-")}-screen`);
@@ -256,7 +256,7 @@ export default class GUI {
       }
       this.updateFocusableElements();
     } else {
-      console.error(`Screen not found: ${screenName}`);
+      console.debug(`Screen not found: ${screenName}`);
     }
   }
 
@@ -278,7 +278,7 @@ export default class GUI {
     const contentId = "use-something-content";
     const content = document.getElementById(contentId);
     if (!content) {
-      console.error(`Element not found: ${contentId}`);
+      console.debug(`Element not found: ${contentId}`);
       return;
     }
 
@@ -306,14 +306,14 @@ export default class GUI {
       if (activeScreenElement) {
         activeScreenElement.classList.add("hidden");
       } else {
-        console.warn(`Active screen element not found: ${this.activeScreen}`);
+        console.debug(`Active screen element not found: ${this.activeScreen}`);
       }
 
       const gameCanvas = document.getElementById("gameCanvas");
       if (gameCanvas) {
         gameCanvas.classList.remove("hidden");
       } else {
-        console.warn("Game canvas element not found");
+        console.debug("Game canvas element not found");
       }
 
       this.activeScreen = null;
@@ -338,7 +338,7 @@ export default class GUI {
     if (button) {
       button.focus();
     } else {
-      console.warn(`Menu option '${optionName}' not found.`);
+      console.debug(`Menu option '${optionName}' not found.`);
     }
   }
 
@@ -364,7 +364,7 @@ export default class GUI {
       gameStateDisplay.textContent = `
             Level: ${currentLevel}`;
     } else {
-      console.warn("Game state display element not found");
+      console.debug("Game state display element not found");
     }
   }
 }
