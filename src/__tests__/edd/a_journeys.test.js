@@ -1,6 +1,6 @@
 // journeys.test.js
 
-const journeys = require("../../journeys.js");
+const journeys = require("../../a_journeys.js");
 
 test("journeyNewGameStart", () => {
   journeys.journeyNewGameStart();

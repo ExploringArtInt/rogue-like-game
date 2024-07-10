@@ -1,12 +1,11 @@
 // excellence.js
 
 /*
-Scalable Excellence-Driven Development (SEDD) is  the pursuit of simplicy and excellence in all aspects of the development process. It focuses on normalizing a healthy cadence of delivering business value through excellence.
+Excellence-Driven Development (EDD) is  the pursuit of simplicy and excellence in all aspects of the development process. It focuses on normalizing a healthy cadence of delivering business value through excellence.
 
-Key principles of Excellence-Driven Development are quality focus and continuous improvement.
+Key principles of Excellence-Driven Development are quality focus, configure everything as code and continuous improvement workly closely with AI tools.
 
-Business Driven Development (BDD) and Test Driven Development (TDD) are integrated parts of the process.
-
+Business Driven Development (BDD) and Test Driven Development (TDD) are integrated parts of the process. It can be used with Kanban, Agile, and other team metholodgies.
 */
 
 // architecture

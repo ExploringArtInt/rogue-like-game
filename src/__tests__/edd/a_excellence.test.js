@@ -1,6 +1,6 @@
 // excellence.test.js
 
-const excellent = require("../../excellence.js");
+const excellent = require("../../a_excellence.js");
 
 test("architecture is excellent", () => {
   excellent.architecture();
