@@ -1,4 +1,10 @@
 // journeys.js
+//
+// Prompt: Review a_journeys.js and suggest additional journeys for the game.
+
+// Result: journey("Energy Management", "player", "Player Abilities", "Consuming energy during movement")
+
+/*** The Prompt that changed everything: Use journey("Energy Management", "player", "Player Abilities", "Consuming energy during movement") to update bdd/player.feature.txt, player.steps.js, player.test.js ***/
 
 export function journeyNewGameStart() {
   journey("New Game Start", "game", "Game Functionality", "Game initialization");
